@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FCE — Análise de Enquadramento</title>
+  <style>
+    :root {
+      --azul: #1f6fb2;
+      --azul-esc: #155080;
+      --azul-cl: #e8f2fb;
+      --borda: #cfe0ee;
+      --verde: #137333;
+      --verde-bg: #e6f4ea;
+      --verm: #c5221f;
+      --verm-bg: #fce8e6;
+      --amar: #a06b00;
+      --amar-bg: #fff6e0;
+      --cinza: #5f6c7b;
+      --txt: #1a2b3c;
+      --bg: #f4f7fa;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      font-size: 14px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(90deg, var(--azul-esc), var(--azul));
+      color: #fff;
+      padding: 14px 22px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    header p {
+      font-size: 11.5px;
+      opacity: .85;
+      margin-top: 3px;
+    }
+
+    .btn-reset {
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, .15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .35);
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .btn-reset:hover {
+      background: rgba(255, 255, 255, .25);
+    }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 18px;
+      padding: 18px;
+      max-width: 1280px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── SEÇÕES ── */
+    .secao {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: opacity .2s;
+    }
+
+    .secao[data-bloqueada="true"] {
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    .secao[data-hidden="true"] {
+      display: none;
+    }
+
+    .secao-header {
+      background: var(--azul-cl);
+      border-bottom: 1px solid var(--borda);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .secao-header h2 {
+      font-size: 13.5px;
+      color: var(--azul-esc);
+      font-weight: 700;
+    }
+
+    .secao-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #e8f2fb;
+      color: var(--azul-esc);
+    }
+
+    .secao-status.ok {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    /* ── PERGUNTAS ── */
+    .pergunta {
+      padding: 13px 16px;
+      border-bottom: 1px solid #eef3f8;
+      transition: background .15s;
+    }
+
+    .pergunta:last-child {
+      border-bottom: none;
+    }
+
+    .pergunta[data-hidden="true"] {
+      display: none;
+    }
+
+    .p-label {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      margin-bottom: 9px;
+    }
+
+    .p-cod {
+      flex-shrink: 0;
+      background: var(--azul);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .p-req {
+      color: var(--verm);
+      font-weight: 700;
+      margin-left: 2px;
+    }
+
+    .p-peso {
+      font-size: 10px;
+      background: var(--amar-bg);
+      color: var(--amar);
+      border-radius: 4px;
+      padding: 1px 6px;
+      margin-left: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── OPÇÕES ── */
+    .opts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .opts.col {
+      flex-direction: column;
+    }
+
+    label.opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-size: 13px;
+      background: #fafcfe;
+      border: 1px solid var(--borda);
+      border-radius: 7px;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    label.opt:hover {
+      background: var(--azul-cl);
+    }
+
+    label.opt input {
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    label.opt.full {
+      flex: 1 1 100%;
+    }
+
+    input[type=text],
+    input[type=number],
+    select {
+      font-size: 13px;
+      padding: 6px 9px;
+      border: 1px solid var(--borda);
+      border-radius: 6px;
+      width: 100%;
+      max-width: 340px;
+      font-family: inherit;
+      background: #fafcfe;
+    }
+
+    input[type=text]:focus,
+    input[type=number]:focus,
+    select:focus {
+      outline: 2px solid var(--azul);
+      outline-offset: 1px;
+    }
+
+    /* ── ATIVIDADES ── */
+    .ativ-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12.5px;
+    }
+
+    .ativ-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cinza);
+      padding: 4px 6px;
+      border-bottom: 1px solid var(--borda);
+    }
+
+    .ativ-table td {
+      padding: 6px;
+      vertical-align: middle;
+    }
+
+    .ativ-table tr:not(:last-child) td {
+      border-bottom: 1px solid #eef3f8;
+    }
+
+    .ativ-classe {
+      font-weight: 700;
+      color: var(--azul-esc);
+      text-align: center;
+    }
+
+    .ativ-calc {
+      font-size: 11px;
+      color: var(--cinza);
+    }
+
+    .btn-add,
+    .btn-rm {
+      font-size: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 5px 11px;
+      font-family: inherit;
+    }
+
+    .btn-add {
+      border: 1px solid var(--azul);
+      color: var(--azul);
+      background: #fff;
+      margin-top: 10px;
+    }
+
+    .btn-add:hover {
+      background: var(--azul-cl);
+    }
+
+    .btn-rm {
+      border: 1px solid #ddd;
+      color: var(--verm);
+      background: #fff;
+    }
+
+    .btn-rm:hover {
+      background: var(--verm-bg);
+    }
+
+    /* ── PAINEL RESULTADO ── */
+    .col-res {
+      position: sticky;
+      top: 18px;
+    }
+
+    .res-card {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .res-card h2 {
+      background: var(--azul-esc);
+      color: #fff;
+      font-size: 13.5px;
+      padding: 11px 16px;
+      font-weight: 700;
+    }
+
+    .res-body {
+      padding: 14px 16px;
+    }
+
+    .kv {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      padding: 7px 0;
+      border-bottom: 1px dashed #e6edf4;
+    }
+
+    .kv:last-of-type {
+      border-bottom: none;
+    }
+
+    .kv .k {
+      color: var(--cinza);
+    }
+
+    .kv .v {
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .modal-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .m-wait {
+      background: #eef3f8;
+      color: var(--cinza);
+    }
+
+    .m-ok {
+      background: var(--verde-bg);
+      color: var(--verde);
+    }
+
+    .m-bloq {
+      background: var(--verm-bg);
+      color: var(--verm);
+    }
+
+    .m-disp {
+      background: var(--amar-bg);
+      color: var(--amar);
+    }
+
+    .tela-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 11.5px;
+      background: var(--azul-cl);
+      color: var(--azul-esc);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-weight: 600;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      font-size: 11px;
+      border-radius: 10px;
+      padding: 2px 8px;
+      background: var(--verm-bg);
+      color: var(--verm);
+    }
+
+    .chip.loc {
+      background: var(--amar-bg);
+      color: var(--amar);
+    }
+
+    .nota-res {
+      font-size: 11px;
+      color: var(--cinza);
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+
+    footer {
+      font-size: 11px;
+      color: var(--cinza);
+      text-align: center;
+      padding: 10px 0 28px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <h1>Questionário FCE — Análise de Enquadramento <span style="font-weight:400;opacity:.75">(POC)</span></h1>
+      <p>Atividade BPMN "5 - Análise de FCE" · analista · FCE v12.0 + DN COPAM 217/2017 + DN 213/2017 (alt. 250/2024)
+      </p>
+    </div>
+    <button class="btn-reset" id="btnReset">↺ Limpar tudo</button>
+  </header>
+
+  <div class="wrap">
+
+    <!-- ════════════════════════════════════════════
+       COL FORMULÁRIO
+  ════════════════════════════════════════════ -->
+    <div id="colForm">
+
+      <!-- ── SEÇÃO: TRIAGEM INICIAL ──────────────────────── -->
+      <section class="secao" id="sec-FRONT">
+        <div class="secao-header">
+          <h2>Triagem inicial</h2>
+          <span class="secao-status" id="st-FRONT">em preenchimento</span>
+        </div>
+
+        <!-- CÓD-01013 -->
+        <div class="pergunta" id="pq-FRONT_LISTADA">
+          <div class="p-label">
+            <span class="p-cod">CÓD-01013</span>
+            A atividade executada no empreendimento está listada na DN nº 217/2017?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="FRONT_LISTADA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="FRONT_LISTADA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- CÓD-05143 — visível quando FRONT_LISTADA = Sim -->
+        <div class="pergunta" id="pq-FRONT_TIPO" data-dep="FRONT_LISTADA" data-dep-val="Sim">
+          <div class="p-label">
+            <span class="p-cod">CÓD-05143</span>
+            Marque o tipo da solicitação:
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts col">
+            <label class="opt full"><input type="radio" name="FRONT_TIPO" value="RENOV"> Renovação de ato autorizativo
+              (fase de operação).</label>
+            <label class="opt full"><input type="radio" name="FRONT_TIPO" value="CORRETIVA"> Licença corretiva por
+              vencimento de ato referente à renovação.</label>
+            <label class="opt full"><input type="radio" name="FRONT_TIPO" value="JA_DETENTOR"> Obtenção de licença de
+              empreendimento já detentor de LP ou LI.</label>
+            <label class="opt full"><input type="radio" name="FRONT_TIPO" value="AMPLIACAO"> Licença para ampliação de
+              empreendimento.</label>
+            <label class="opt full"><input type="radio" name="FRONT_TIPO" value="NOVA"> Nova solicitação.</label>
+          </div>
+        </div>
+
+        <!-- CÓD-05163 — visível quando FRONT_TIPO = NOVA -->
+        <div class="pergunta" id="pq-FRONT_ANTERIOR" data-dep="FRONT_TIPO" data-dep-val="NOVA">
+          <div class="p-label">
+            <span class="p-cod">CÓD-05163</span>
+            Houve algum outro pedido de licenciamento para o empreendimento anteriormente a 05/11/2019?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="FRONT_ANTERIOR" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="FRONT_ANTERIOR" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- CÓD-02001 — visível quando FRONT_LISTADA = Sim -->
+        <div class="pergunta" id="pq-FRONT_TRANSPORTE" data-dep="FRONT_LISTADA" data-dep-val="Sim">
+          <div class="p-label">
+            <span class="p-cod">CÓD-02001</span>
+            Trata-se de atividade que abrange somente o transporte rodoviário de produtos perigosos (Código F-02-01-1)?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="FRONT_TRANSPORTE" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="FRONT_TRANSPORTE" value="Nao"> Não</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SEÇÃO: M1 — CRITÉRIOS LOCACIONAIS ──────────── -->
+      <section class="secao" id="sec-M1" data-dep-sec="FRONT_TRANSPORTE" data-dep-sec-val="Nao" data-prev-sec="FRONT">
+        <div class="secao-header">
+          <h2>Módulo 1 — Critérios locacionais <span style="font-weight:400;font-size:12px">(consultar
+              IDE-Sisema)</span></h2>
+          <span class="secao-status" id="st-M1">em preenchimento</span>
+        </div>
+
+        <!-- LOC_UC_PI -->
+        <div class="pergunta" id="pq-LOC_UC_PI">
+          <div class="p-label">
+            Localizado em Unidade de Conservação de Proteção Integral (hipóteses em Lei)?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 2</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_UC_PI" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_UC_PI" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_ZONA_AMORT -->
+        <div class="pergunta" id="pq-LOC_ZONA_AMORT">
+          <div class="p-label">
+            Em zona de amortecimento de UC de Proteção Integral ou faixa de 3 km do entorno (excl. áreas urbanas)?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_ZONA_AMORT" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_ZONA_AMORT" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_UC_US -->
+        <div class="pergunta" id="pq-LOC_UC_US">
+          <div class="p-label">
+            Em UC de Uso Sustentável, exceto APA?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_UC_US" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_UC_US" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_APA -->
+        <div class="pergunta" id="pq-LOC_APA">
+          <div class="p-label">
+            Localizado em Área de Proteção Ambiental (APA)?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_APA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_APA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_APA_NOME — visível quando LOC_APA = Sim -->
+        <div class="pergunta" id="pq-LOC_APA_NOME" data-dep="LOC_APA" data-dep-val="Sim">
+          <div class="p-label">
+            Se SIM, informar o nome da APA:
+          </div>
+          <input type="text" id="LOC_APA_NOME" name="LOC_APA_NOME" placeholder="Nome da APA">
+        </div>
+
+        <!-- LOC_RESERVA_BIOSFERA -->
+        <div class="pergunta" id="pq-LOC_RESERVA_BIOSFERA">
+          <div class="p-label">
+            Em Reserva da Biosfera (excl. áreas urbanas)?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_RESERVA_BIOSFERA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_RESERVA_BIOSFERA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_CORREDOR -->
+        <div class="pergunta" id="pq-LOC_CORREDOR">
+          <div class="p-label">
+            Em Corredor Ecológico formalmente instituído?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_CORREDOR" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_CORREDOR" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_RAMSAR -->
+        <div class="pergunta" id="pq-LOC_RAMSAR">
+          <div class="p-label">
+            Em áreas designadas como Sítios Ramsar?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 2</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_RAMSAR" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_RAMSAR" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_DRENAGEM_ESPECIAL -->
+        <div class="pergunta" id="pq-LOC_DRENAGEM_ESPECIAL">
+          <div class="p-label">
+            Em área de drenagem a montante de curso d'água de classe especial?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_DRENAGEM_ESPECIAL" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_DRENAGEM_ESPECIAL" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_CAPTACAO_CONFLITO -->
+        <div class="pergunta" id="pq-LOC_CAPTACAO_CONFLITO">
+          <div class="p-label">
+            Captação de água superficial em Área de Conflito por uso de recursos hídricos?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_CAPTACAO_CONFLITO" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_CAPTACAO_CONFLITO" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_CAVIDADES -->
+        <div class="pergunta" id="pq-LOC_CAVIDADES">
+          <div class="p-label">
+            Em área de alto/muito alto grau de potencialidade de cavidades (CECAV-ICMBio)?
+            <span class="p-req">*</span>
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_CAVIDADES" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_CAVIDADES" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_AREA_URBANIZADA — visível quando LOC_CAVIDADES = Nao -->
+        <div class="pergunta" id="pq-LOC_AREA_URBANIZADA" data-dep="LOC_CAVIDADES" data-dep-val="Nao">
+          <div class="p-label">
+            O empreendimento e seu entorno de 250 m estão em área totalmente urbanizada?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_AREA_URBANIZADA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_AREA_URBANIZADA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_IMPACTO_CAVIDADES — visível quando LOC_AREA_URBANIZADA = Nao -->
+        <div class="pergunta" id="pq-LOC_IMPACTO_CAVIDADES" data-dep="LOC_AREA_URBANIZADA" data-dep-val="Nao">
+          <div class="p-label">
+            Se NÃO, terá impacto real/potencial sobre cavidades na ADA ou entorno de 250 m?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_IMPACTO_CAVIDADES" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_IMPACTO_CAVIDADES" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUPRESSAO -->
+        <div class="pergunta" id="pq-LOC_SUPRESSAO">
+          <div class="p-label">
+            Haverá supressão de vegetação?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUPRESSAO_REGULAR — visível quando LOC_SUPRESSAO = Sim -->
+        <div class="pergunta" id="pq-LOC_SUPRESSAO_REGULAR" data-dep="LOC_SUPRESSAO" data-dep-val="Sim">
+          <div class="p-label">
+            Se SIM, a intervenção se encontra regularizada?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_REGULAR" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_REGULAR" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUPRESSAO_NATIVA — visível quando LOC_SUPRESSAO_REGULAR = Nao -->
+        <div class="pergunta" id="pq-LOC_SUPRESSAO_NATIVA" data-dep="LOC_SUPRESSAO_REGULAR" data-dep-val="Nao">
+          <div class="p-label">
+            Se NÃO regularizada: haverá supressão de vegetação nativa (exceto árvores isoladas)?
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_NATIVA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_NATIVA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUPRESSAO_PRIORITARIA — visível quando LOC_SUPRESSAO_REGULAR = Nao -->
+        <div class="pergunta" id="pq-LOC_SUPRESSAO_PRIORITARIA" data-dep="LOC_SUPRESSAO_REGULAR" data-dep-val="Nao">
+          <div class="p-label">
+            Se NÃO regularizada: supressão de nativa em área prioritária (importância biológica extrema/especial)?
+            <span class="p-peso">peso 2</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_PRIORITARIA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_PRIORITARIA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_ARVORES -->
+        <div class="pergunta" id="pq-LOC_ARVORES">
+          <div class="p-label">
+            Haverá corte/aproveitamento de árvores isoladas nativas vivas?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_ARVORES" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_ARVORES" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUP_PASSADA -->
+        <div class="pergunta" id="pq-LOC_SUP_PASSADA">
+          <div class="p-label">
+            Houve supressão de vegetação posterior a 22/07/2008?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUP_PASSADA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUP_PASSADA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUP_PASSADA_REG — visível quando LOC_SUP_PASSADA = Sim -->
+        <div class="pergunta" id="pq-LOC_SUP_PASSADA_REG" data-dep="LOC_SUP_PASSADA" data-dep-val="Sim">
+          <div class="p-label">
+            Se SIM, a intervenção se encontra regularizada?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUP_PASSADA_REG" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUP_PASSADA_REG" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUPRESSAO_PASSADA_NATIVA — visível quando LOC_SUP_PASSADA_REG = Nao -->
+        <div class="pergunta" id="pq-LOC_SUPRESSAO_PASSADA_NATIVA" data-dep="LOC_SUP_PASSADA_REG" data-dep-val="Nao">
+          <div class="p-label">
+            Se NÃO regularizada: ocorreu supressão de nativa (exceto isoladas)?
+            <span class="p-peso">peso 1</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_PASSADA_NATIVA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_PASSADA_NATIVA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- LOC_SUPRESSAO_PASSADA_PRIORITARIA — visível quando LOC_SUP_PASSADA_REG = Nao -->
+        <div class="pergunta" id="pq-LOC_SUPRESSAO_PASSADA_PRIORITARIA" data-dep="LOC_SUP_PASSADA_REG"
+          data-dep-val="Nao">
+          <div class="p-label">
+            Se NÃO regularizada: supressão de nativa em área prioritária?
+            <span class="p-peso">peso 2</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_PASSADA_PRIORITARIA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="LOC_SUPRESSAO_PASSADA_PRIORITARIA" value="Nao"> Não</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SEÇÃO: M2 — FATORES DE RESTRIÇÃO ───────────── -->
+      <section class="secao" id="sec-M2" data-prev-sec="M1">
+        <div class="secao-header">
+          <h2>Módulo 2 — Fatores de restrição ou vedação</h2>
+          <span class="secao-status" id="st-M2">em preenchimento</span>
+        </div>
+
+        <!-- VED_RIO_PP -->
+        <div class="pergunta" id="pq-VED_RIO_PP">
+          <div class="p-label">
+            Intervenção em rio de preservação permanente (art. 3º, Lei 15.082/04)?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="VED_RIO_PP" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="VED_RIO_PP" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- VED_EFLUENTE -->
+        <div class="pergunta" id="pq-VED_EFLUENTE">
+          <div class="p-label">
+            Lançamento de efluentes/resíduos tratados em águas de Classe Especial?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="VED_EFLUENTE" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="VED_EFLUENTE" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- VED_MANANCIAL -->
+        <div class="pergunta" id="pq-VED_MANANCIAL">
+          <div class="p-label">
+            Localizado em manancial a montante de captação (águas Classe Especial)?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="VED_MANANCIAL" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="VED_MANANCIAL" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- VED_IMPACTO — multi -->
+        <div class="pergunta" id="pq-VED_IMPACTO">
+          <div class="p-label">
+            O empreendimento tem/terá impacto em (marcar todos que se aplicam):
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts col" id="opts-VED_IMPACTO">
+            <label class="opt full"><input type="checkbox" name="VED_IMPACTO" value="TI"> Terra indígena</label>
+            <label class="opt full"><input type="checkbox" name="VED_IMPACTO" value="TQ"> Terra quilombola</label>
+            <label class="opt full"><input type="checkbox" name="VED_IMPACTO" value="ASA"> Área de Segurança
+              Aeroportuária c/ avifauna</label>
+            <label class="opt full"><input type="checkbox" name="VED_IMPACTO" value="BC"> Bem cultural
+              acautelado</label>
+            <label class="opt full"><input type="checkbox" name="VED_IMPACTO" value="NA"> Não se aplica</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SEÇÃO: M3 — OUTRAS INTERVENÇÕES ────────────── -->
+      <section class="secao" id="sec-M3" data-prev-sec="M2">
+        <div class="secao-header">
+          <h2>Módulo 3 — Outras intervenções</h2>
+          <span class="secao-status" id="st-M3">em preenchimento</span>
+        </div>
+
+        <!-- INT_APP_SS -->
+        <div class="pergunta" id="pq-INT_APP_SS">
+          <div class="p-label">
+            Intervenção em APP sem supressão de nativa?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_APP_SS" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_APP_SS" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_DESTOCA -->
+        <div class="pergunta" id="pq-INT_DESTOCA">
+          <div class="p-label">
+            Destoca em área remanescente de supressão?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_DESTOCA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_DESTOCA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_MANEJO -->
+        <div class="pergunta" id="pq-INT_MANEJO">
+          <div class="p-label">
+            Manejo sustentável da vegetação nativa?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_MANEJO" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_MANEJO" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_LENHOSO -->
+        <div class="pergunta" id="pq-INT_LENHOSO">
+          <div class="p-label">
+            Aproveitamento de material lenhoso?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_LENHOSO" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_LENHOSO" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_RL -->
+        <div class="pergunta" id="pq-INT_RL">
+          <div class="p-label">
+            Intervenção em Reserva Legal posterior a 22/07/2008?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_RL" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_RL" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_RL_REC — visível quando INT_RL = Sim -->
+        <div class="pergunta" id="pq-INT_RL_REC" data-dep="INT_RL" data-dep-val="Sim">
+          <div class="p-label">
+            Se SIM, foi efetuada a recomposição da RL?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_RL_REC" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_RL_REC" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_APP -->
+        <div class="pergunta" id="pq-INT_APP">
+          <div class="p-label">
+            Intervenção em APP posterior a 22/07/2008?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_APP" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_APP" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_APP_REG — visível quando INT_APP = Sim -->
+        <div class="pergunta" id="pq-INT_APP_REG" data-dep="INT_APP" data-dep-val="Sim">
+          <div class="p-label">
+            Se SIM, a intervenção se encontra regularizada?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_APP_REG" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_APP_REG" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- INT_RH -->
+        <div class="pergunta" id="pq-INT_RH">
+          <div class="p-label">
+            Uso ou intervenção em recurso hídrico?
+            <span class="p-req">*</span>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="INT_RH" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="INT_RH" value="Nao"> Não</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SEÇÃO: M4 — CLASSIFICAÇÃO DAS ATIVIDADES ───── -->
+      <section class="secao" id="sec-M4" data-prev-sec="M3">
+        <div class="secao-header">
+          <h2>Módulo 4 — Classificação das atividades</h2>
+          <span class="secao-status" id="st-M4">em preenchimento</span>
+        </div>
+
+        <!-- 4.1 Atividades -->
+        <div class="pergunta" id="pq-ATIVIDADES">
+          <div class="p-label"><b>4.1 — Dados das atividades</b> — adicione as atividades; o porte e a classe são
+            calculados automaticamente.</div>
+          <table class="ativ-table" id="ativ-table">
+            <thead>
+              <tr>
+                <th>Atividade</th>
+                <th>Quantidade</th>
+                <th>Pot/Porte</th>
+                <th>Classe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ativ-tbody"></tbody>
+          </table>
+          <button class="btn-add" id="btn-add-ativ">+ adicionar atividade</button>
+        </div>
+
+        <!-- EXC_EIA -->
+        <div class="pergunta" id="pq-EXC_EIA">
+          <div class="p-label">
+            <b>4.2</b> — O processo tem obrigatoriedade de EIA/RIMA (exceções da DN, ex.: aterro > 20 t/dia, minério de
+            ferro, Mata Atlântica, etc.)?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="EXC_EIA" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="EXC_EIA" value="Nao"> Não</label>
+          </div>
+        </div>
+
+        <!-- EXC_POSTO -->
+        <div class="pergunta" id="pq-EXC_POSTO">
+          <div class="p-label">
+            <b>4.2</b> — Sistema de abastecimento aéreo de combustíveis até 15 m³, exclusivo do detentor?
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="EXC_POSTO" value="Sim"> Sim</label>
+            <label class="opt"><input type="radio" name="EXC_POSTO" value="Nao"> Não</label>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /colForm -->
+
+    <!-- ════════════════════════════════════════════
+       COL RESULTADO
+  ════════════════════════════════════════════ -->
+    <div class="col-res">
+      <div class="res-card">
+        <h2>Enquadramento (ao vivo)</h2>
+        <div class="res-body" id="res-body">
+          <!-- preenchido pelo JS -->
+        </div>
+      </div>
+      <p class="nota-res" style="margin-top:10px">
+        POC — lógica derivada do FCE v12.0 + DN 217/2017. Catálogo de atividades reduzido (amostra). Revelação
+        progressiva: cada módulo aparece quando o anterior está completo.
+      </p>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <footer>Silo Sistema · Notpaper · Módulo de Licenciamento Ambiental — POC do questionário FCE</footer>
+
+  <!-- ═══════════════════════════════════════════════════════
+       JAVASCRIPT — lógica central (condicional + cálculo)
+       ═══════════════════════════════════════════════════════
+   -->
+  <script>
+    'use strict';
+
+    /* ─── MATRIZES ─── */
+    const MATRIZ_CLASSE = {
+      P: { P: 1, M: 2, G: 4 },
+      M: { P: 1, M: 3, G: 5 },
+      G: { P: 1, M: 4, G: 6 }
+    };
+    const MATRIZ_MODALIDADE = {
+      0: { 1: 'LAS-Cadastro', 2: 'LAS-Cadastro', 3: 'LAS-RAS',  4: 'LAC1', 5: 'LAC2', 6: 'LAC2' },
+      1: { 1: 'LAS-Cadastro', 2: 'LAS-RAS',      3: 'LAC1',     4: 'LAC2', 5: 'LAC2', 6: 'LAT'  },
+      2: { 1: 'LAS-RAS',      2: 'LAC1',         3: 'LAC2',     4: 'LAC2', 5: 'LAT',  6: 'LAT'  }
+    };
+    const TELA = {
+      'LAS-Cadastro': 'Tela 4 — LAS Cadastro',
+      'LAS-RAS':      'Tela 5 — LAS RAS',
+      'LAC1':         'Tela 6 — LA (Concomitante)',
+      'LAC2':         'Tela 6 — LA (Concomitante)',
+      'LAT':          'Tela 6 — LA (Trifásico)',
+      'DISPENSA':     'Tela 10 — Dispensa',
+      'TRANSPORTE':   'Tela 8 — Transporte',
+      'RENOVAÇÃO':    'Tela 7 — Renovação'
+    };
+
+    /* ─── CATÁLOGO ─── */
+    const CATALOGO = [
+      { cod: 'A-02-09-7', desc: 'Extração de rocha p/ britas',              geral: 'M', un: 't/ano',        faixaP: 30000,   faixaM: 200000   },
+      { cod: 'A-03-01-8', desc: 'Extração de areia e cascalho (constr.)',    geral: 'M', un: 'm³/ano',       faixaP: 10000,   faixaM: 50000    },
+      { cod: 'A-04-01-4', desc: 'Extração de água mineral/potável de mesa',  geral: 'P', un: 'L/ano',        faixaP: 6000000, faixaM: 15000000 },
+      { cod: 'B-01-01-5', desc: 'Britamento de pedras para construção',      geral: 'M', un: 'ha (área útil)',faixaP: 3,       faixaM: 10       },
+      { cod: 'B-01-03-1', desc: 'Fabricação de cerâmica vermelha',           geral: 'P', un: 't/ano',        faixaP: 12000,   faixaM: 50000    },
+      { cod: 'OUTRA',     desc: 'Outra atividade (definir manualmente)',      geral: null, un: '', manual: true }
+    ];
+
+    /* ─── PESOS LOCACIONAIS ─── */
+    const PESOS = {
+      LOC_UC_PI: 2, LOC_ZONA_AMORT: 1, LOC_UC_US: 1,
+      LOC_RESERVA_BIOSFERA: 1, LOC_CORREDOR: 1, LOC_RAMSAR: 2,
+      LOC_DRENAGEM_ESPECIAL: 1, LOC_CAPTACAO_CONFLITO: 1, LOC_CAVIDADES: 1,
+      LOC_SUPRESSAO_NATIVA: 1, LOC_SUPRESSAO_PRIORITARIA: 2,
+      LOC_SUPRESSAO_PASSADA_NATIVA: 1, LOC_SUPRESSAO_PASSADA_PRIORITARIA: 2
+    };
+
+    /* ─── VEDAÇÕES (M2) ─── */
+    const VEDACOES_MAP = {
+      VED_RIO_PP:    'Rio de Preservação Permanente',
+      VED_EFLUENTE:  'Lançamento em Classe Especial',
+      VED_MANANCIAL: 'Manancial Classe Especial'
+    };
+    const VEDACOES_MULTI = {
+      TI: 'Terra Indígena', TQ: 'Terra Quilombola',
+      ASA: 'ASA — avifauna', BC: 'Bem cultural acautelado'
+    };
+
+    /* ─── SEÇÕES (para controle de progressão) ─── */
+    const ORDEM_SECOES = ['FRONT', 'M1', 'M2', 'M3', 'M4'];
+
+    /* ─── CAMPOS OBRIGATÓRIOS POR SEÇÃO ─── */
+    const OBRIGATORIOS = {
+      FRONT: [
+        ['FRONT_LISTADA', 'radio']
+        // FRONT_TIPO e FRONT_TRANSPORTE só quando FRONT_LISTADA=Sim (tratado em secaoCompleta)
+      ],
+      M1: [
+        ['LOC_UC_PI', 'radio'], ['LOC_ZONA_AMORT', 'radio'], ['LOC_UC_US', 'radio'],
+        ['LOC_APA', 'radio'], ['LOC_RESERVA_BIOSFERA', 'radio'], ['LOC_CORREDOR', 'radio'],
+        ['LOC_RAMSAR', 'radio'], ['LOC_DRENAGEM_ESPECIAL', 'radio'], ['LOC_CAPTACAO_CONFLITO', 'radio'],
+        ['LOC_CAVIDADES', 'radio'], ['LOC_SUPRESSAO', 'radio'], ['LOC_ARVORES', 'radio'], ['LOC_SUP_PASSADA', 'radio']
+      ],
+      M2: [
+        ['VED_RIO_PP', 'radio'], ['VED_EFLUENTE', 'radio'], ['VED_MANANCIAL', 'radio'],
+        ['VED_IMPACTO', 'multi']
+      ],
+      M3: [
+        ['INT_APP_SS', 'radio'], ['INT_DESTOCA', 'radio'], ['INT_MANEJO', 'radio'],
+        ['INT_LENHOSO', 'radio'], ['INT_RL', 'radio'], ['INT_APP', 'radio'], ['INT_RH', 'radio']
+      ],
+      M4: []
+    };
+
+    /* ══════════════════════════════════════════════════════
+       MÓDULO PRINCIPAL
+    ══════════════════════════════════════════════════════ */
+    const formularioFCE = (function () {
+
+      const $el = {};
+      const atividades = [];
+
+      /* ── init ── */
+      function init() {
+        registrarElementos();
+        inicializarElementos();
+        registrarEventos();
+      }
+
+      /* ── registrarElementos ── */
+      function registrarElementos() {
+        $el.colForm    = document.getElementById('colForm');
+        $el.btnReset   = document.getElementById('btnReset');
+        $el.btnAddAtiv = document.getElementById('btn-add-ativ');
+        $el.ativTbody  = document.getElementById('ativ-tbody');
+        $el.resBody    = document.getElementById('res-body');
+      }
+
+      /* ── inicializarElementos ── */
+      function inicializarElementos() {
+        renderAtividades();
+        atualizar();
+      }
+
+      /* ── registrarEventos ── */
+      function registrarEventos() {
+        $el.colForm.removeEventListener('change', atualizar);
+        $el.colForm.addEventListener('change', atualizar);
+
+        $el.colForm.removeEventListener('input', atualizar);
+        $el.colForm.addEventListener('input', atualizar);
+
+        $el.btnAddAtiv.onclick = () => {
+          atividades.push({ cod: 'A-02-09-7', qtd: '', potManual: 'M', porteManual: 'P' });
+          renderAtividades();
+          calcular();
+          atualizar();
+        };
+
+        $el.btnReset.onclick = () => {
+          document.querySelectorAll('input[type=radio]:checked').forEach(r => r.checked = false);
+          document.querySelectorAll('input[type=checkbox]:checked').forEach(c => c.checked = false);
+          document.querySelectorAll('input[type=text], input[type=number]').forEach(i => i.value = '');
+          atividades.length = 0;
+          renderAtividades();
+          atualizar();
+        };
+      }
+
+      /* ══════════════════════════════════════════
+         LEITURA DO ESTADO DO FORMULÁRIO
+      ══════════════════════════════════════════ */
+      function lerCampo(name) {
+        const radio = document.querySelector(`input[name="${name}"]:checked`);
+        if (radio) return radio.value;
+        const inp = document.getElementById(name);
+        if (inp) return inp.value.trim();
+        return undefined;
+      }
+
+      function lerMulti(name) {
+        return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(c => c.value);
+      }
+
+      /* ══════════════════════════════════════════
+         VISIBILIDADE DE PERGUNTAS INDIVIDUAIS
+         Regra: data-dep / data-dep-val no elemento .pergunta
+      ══════════════════════════════════════════ */
+      function atualizarPerguntasVisiveis() {
+        document.querySelectorAll('.pergunta[data-dep]').forEach(el => {
+          const dep    = el.dataset.dep;
+          const depVal = el.dataset.depVal;
+          const visivel = (lerCampo(dep) === depVal);
+          el.style.display = visivel ? '' : 'none';
+          if (!visivel) limparCampo(el);
+        });
+      }
+
+      function limparCampo(el) {
+        el.querySelectorAll('input[type=radio]:checked').forEach(r => r.checked = false);
+        el.querySelectorAll('input[type=checkbox]:checked').forEach(c => c.checked = false);
+        el.querySelectorAll('input[type=text], input[type=number]').forEach(i => i.value = '');
+      }
+
+      /* ══════════════════════════════════════════
+         VISIBILIDADE DE SEÇÕES (progressão)
+         - FRONT  → sempre visível
+         - M1     → FRONT_TRANSPORTE === 'Nao'  AND  FRONT completo
+         - M2..M4 → seção anterior completa
+      ══════════════════════════════════════════ */
+      function secaoVisivel(id) {
+        if (id === 'FRONT') return true;
+        if (id === 'M1') {
+          return lerCampo('FRONT_TRANSPORTE') === 'Nao' && secaoCompleta('FRONT');
+        }
+        const idx = ORDEM_SECOES.indexOf(id);
+        if (idx > 0) {
+          const prev = ORDEM_SECOES[idx - 1];
+          return secaoVisivel(prev) && secaoCompleta(prev);
+        }
+        return false;
+      }
+
+      function secaoCompleta(id) {
+        if (id === 'FRONT') {
+          if (!lerCampo('FRONT_LISTADA')) return false;
+          if (lerCampo('FRONT_LISTADA') === 'Sim') {
+            if (!lerCampo('FRONT_TIPO')) return false;
+            if (!lerCampo('FRONT_TRANSPORTE')) return false;
+          }
+          return true;
+        }
+        if (id === 'M4') {
+          return atividades.some(a => classeAtividade(a).classe != null);
+        }
+        const campos = OBRIGATORIOS[id] || [];
+        return campos.every(([name, tipo]) => {
+          const pq = document.getElementById(`pq-${name}`);
+          if (pq && pq.style.display === 'none') return true;
+          if (tipo === 'multi') return lerMulti(name).length > 0;
+          return !!lerCampo(name);
+        });
+      }
+
+      function atualizarSecoesVisiveis() {
+        ORDEM_SECOES.forEach(id => {
+          const sec = document.getElementById(`sec-${id}`);
+          if (!sec) return;
+          sec.style.display = secaoVisivel(id) ? '' : 'none';
+          const st = document.getElementById(`st-${id}`);
+          if (st) {
+            const ok = secaoCompleta(id);
+            st.textContent = ok ? '✓ completo' : 'em preenchimento';
+            st.className = 'secao-status' + (ok ? ' ok' : '');
+          }
+        });
+      }
+
+      /* ══════════════════════════════════════════
+         TABELA DE ATIVIDADES
+      ══════════════════════════════════════════ */
+      function classeAtividade(a) {
+        const cat = CATALOGO.find(c => c.cod === a.cod);
+        if (!cat) return {};
+        if (cat.manual) {
+          return {
+            potencial: a.potManual,
+            porte: a.porteManual,
+            classe: MATRIZ_CLASSE[a.porteManual][a.potManual]
+          };
+        }
+        const q = parseFloat(a.qtd);
+        if (isNaN(q) || a.qtd === '') return { potencial: cat.geral };
+        const porte = q <= cat.faixaP ? 'P' : (q <= cat.faixaM ? 'M' : 'G');
+        return { potencial: cat.geral, porte, classe: MATRIZ_CLASSE[porte][cat.geral] };
+      }
+
+      function renderAtividades() {
+        $el.ativTbody.innerHTML = '';
+        atividades.forEach((a, idx) => {
+          const cat = CATALOGO.find(c => c.cod === a.cod) || {};
+          const res = classeAtividade(a);
+          const tr  = document.createElement('tr');
+
+          // select atividade
+          const tdSel = document.createElement('td');
+          const sel   = document.createElement('select');
+          sel.style.maxWidth = '100%';
+          CATALOGO.forEach(c => {
+            const op = document.createElement('option');
+            op.value = c.cod;
+            op.textContent = c.cod + ' — ' + c.desc;
+            if (a.cod === c.cod) op.selected = true;
+            sel.appendChild(op);
+          });
+          sel.onchange = () => { a.cod = sel.value; a.qtd = ''; a.potManual = 'M'; a.porteManual = 'P'; renderAtividades(); calcular(); };
+          tdSel.appendChild(sel);
+          tr.appendChild(tdSel);
+
+          // quantidade / seletores manuais
+          const tdQtd = document.createElement('td');
+          if (cat.manual) {
+            const spP = document.createElement('select');
+            ['P', 'M', 'G'].forEach(p => {
+              const o = document.createElement('option');
+              o.value = p; o.textContent = 'Pot. ' + p;
+              if (a.potManual === p) o.selected = true;
+              spP.appendChild(o);
+            });
+            spP.onchange = () => { a.potManual = spP.value; renderAtividades(); calcular(); };
+
+            const spO = document.createElement('select');
+            ['P', 'M', 'G'].forEach(p => {
+              const o = document.createElement('option');
+              o.value = p; o.textContent = 'Porte ' + p;
+              if (a.porteManual === p) o.selected = true;
+              spO.appendChild(o);
+            });
+            spO.onchange = () => { a.porteManual = spO.value; renderAtividades(); calcular(); };
+
+            tdQtd.appendChild(spP);
+            tdQtd.appendChild(document.createTextNode(' '));
+            tdQtd.appendChild(spO);
+          } else {
+            const inp = document.createElement('input');
+            inp.type = 'number';
+            inp.placeholder = cat.un || 'qtde';
+            inp.value = (a.qtd !== '' && !isNaN(a.qtd)) ? a.qtd : '';
+            inp.style.maxWidth = '100px';
+            inp.oninput = () => { a.qtd = inp.value; renderAtividades(); calcular(); };
+            tdQtd.appendChild(inp);
+          }
+          tr.appendChild(tdQtd);
+
+          // pot/porte
+          const tdCalc = document.createElement('td');
+          tdCalc.className = 'ativ-calc';
+          tdCalc.textContent = cat.manual ? '' : (cat.geral ? ('Pot ' + cat.geral + (res.porte ? ' · Porte ' + res.porte : '')) : '');
+          tr.appendChild(tdCalc);
+
+          // classe
+          const tdCl = document.createElement('td');
+          tdCl.className = 'ativ-classe';
+          tdCl.textContent = res.classe != null ? ('Cl. ' + res.classe) : '—';
+          tr.appendChild(tdCl);
+
+          // remover
+          const tdRm  = document.createElement('td');
+          const btnRm = document.createElement('button');
+          btnRm.className = 'btn-rm';
+          btnRm.textContent = '×';
+          btnRm.title = 'Remover';
+          btnRm.onclick = () => { atividades.splice(idx, 1); renderAtividades(); calcular(); atualizar(); };
+          tdRm.appendChild(btnRm);
+          tr.appendChild(tdRm);
+
+          $el.ativTbody.appendChild(tr);
+        });
+      }
+
+      /* ══════════════════════════════════════════
+         MOTOR DE CÁLCULO → PAINEL RESULTADO
+      ══════════════════════════════════════════ */
+      function calcular() {
+        const listada   = lerCampo('FRONT_LISTADA');
+        const tipo      = lerCampo('FRONT_TIPO');
+        const transporte = lerCampo('FRONT_TRANSPORTE');
+        const excEIA    = lerCampo('EXC_EIA');
+
+        let competencia = '—', modalidade = null, status = 'wait', tela = null;
+        const vedacoes = [], locAtivos = [];
+
+        // fator locacional (max dos pesos individuais, cap 2)
+        let fatorLoc = 0;
+        Object.entries(PESOS).forEach(([id, peso]) => {
+          if (lerCampo(id) === 'Sim') {
+            if (peso > fatorLoc) fatorLoc = peso;
+            locAtivos.push({ id, peso });
+          }
+        });
+        fatorLoc = Math.min(fatorLoc, 2);
+
+        // vedações booleanas
+        Object.entries(VEDACOES_MAP).forEach(([id, label]) => {
+          if (lerCampo(id) === 'Sim') vedacoes.push(label);
+        });
+        // vedações multi
+        lerMulti('VED_IMPACTO').forEach(v => {
+          if (VEDACOES_MULTI[v]) vedacoes.push(VEDACOES_MULTI[v]);
+        });
+
+        // classe predominante
+        let classeP = null;
+        atividades.forEach(a => {
+          const c = classeAtividade(a).classe;
+          if (c != null && (classeP === null || c > classeP)) classeP = c;
+        });
+
+        const eiarima = (excEIA === 'Sim');
+
+        // roteamento principal
+        if (listada === 'Nao') {
+          modalidade = 'DISPENSA'; status = 'disp';
+          tela = TELA['DISPENSA']; competencia = 'Não listada → Dispensa';
+        } else if (transporte === 'Sim') {
+          modalidade = 'TRANSPORTE'; status = 'ok';
+          tela = TELA['TRANSPORTE']; competencia = 'Municipal';
+        } else if (tipo === 'RENOV') {
+          modalidade = 'RENOVAÇÃO'; status = 'ok';
+          tela = TELA['RENOVAÇÃO']; competencia = 'Municipal';
+        } else if (listada === 'Sim') {
+          competencia = 'Municipal (verificar SIMMA)';
+          if (vedacoes.length) status = 'bloq';
+          if (classeP != null) {
+            const row = MATRIZ_MODALIDADE[fatorLoc] || MATRIZ_MODALIDADE[2];
+            modalidade = row[classeP];
+            if (eiarima) modalidade = 'LAT';
+            tela = TELA[modalidade];
+            if (status !== 'bloq') status = 'ok';
+          }
+        }
+
+        // monta HTML do painel
+        let h = '';
+        h += kv('Competência', competencia);
+        h += kv('Solicitação', rotuloTipo(tipo));
+        h += kv('Classe predominante', classeP != null ? 'Classe ' + classeP : '— (informe atividades)');
+        h += kv('Fator locacional', fatorLoc + (locAtivos.length ? '' : ' (nenhum critério)'));
+        if (locAtivos.length) {
+          h += '<div class="chips">' +
+            locAtivos.map(x => `<span class="chip loc">${x.id.replace(/^LOC_/, '')} · ${x.peso}</span>`).join('') +
+            '</div>';
+        }
+        h += kv('EIA/RIMA (4.2)', eiarima ? 'Sim → força LAT' : 'Não');
+        h += kv('Vedações', vedacoes.length ? '' : 'nenhuma');
+        if (vedacoes.length) {
+          h += '<div class="chips">' + vedacoes.map(v => `<span class="chip">${v}</span>`).join('') + '</div>';
+        }
+
+        let cls = 'm-wait', txt = 'Aguardando preenchimento';
+        if (status === 'disp')                 { cls = 'm-disp'; txt = 'DISPENSA DE LICENCIAMENTO'; }
+        else if (status === 'bloq')             { cls = 'm-bloq'; txt = 'VEDAÇÃO / BLOQUEIO' + (modalidade ? ' — calc.: ' + modalidade : ''); }
+        else if (status === 'ok' && modalidade) { cls = 'm-ok';   txt = 'MODALIDADE: ' + modalidade; }
+
+        h += `<div class="modal-box ${cls}">${txt}</div>`;
+        if (tela) h += `<div class="tela-tag">↳ ${tela}</div>`;
+        if (status === 'bloq') {
+          h += '<p class="nota-res" style="margin-top:8px">Vedação ativa → candidato a <b>Indeferido</b> ou <b>Solicitar Adequação</b> no BPMN.</p>';
+        }
+
+        $el.resBody.innerHTML = h;
+      }
+
+      function kv(k, v) {
+        return `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+      }
+
+      function rotuloTipo(t) {
+        return ({
+          RENOV:       'Renovação (operação)',
+          CORRETIVA:   'Corretiva',
+          JA_DETENTOR: 'Já detentor (LP/LI)',
+          AMPLIACAO:   'Ampliação',
+          NOVA:        'Nova solicitação'
+        })[t] || '—';
+      }
+
+      /* ══════════════════════════════════════════
+         ORQUESTRADOR PRINCIPAL
+      ══════════════════════════════════════════ */
+      function atualizar() {
+        atualizarPerguntasVisiveis();
+        atualizarSecoesVisiveis();
+        calcular();
+      }
+
+      return { init };
+
+    })();
+
+    /* ── ponto de entrada ── */
+    formularioFCE.init();
+  </script>
+</body>
+
+</html>

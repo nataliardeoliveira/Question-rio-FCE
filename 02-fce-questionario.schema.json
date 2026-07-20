@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "titulo": "Questionário FCE — Análise de Enquadramento",
+    "versao": "1.0-draft",
+    "origem": "FCE ELETRÔNICO v12.0 + DN COPAM 217/2017 + DN COPAM 213/2017 (alt. 250/2024)",
+    "preenchidoPor": "analista",
+    "atividadeBPMN": "5 - Análise de FCE",
+    "observacao": "Referência DN 217/2017 mantida conforme formulário. Telas 4-8 são caracterização (coleta de dados) roteada pela modalidade resultante.",
+    "atualizadoEm": "2026-05-29"
+  },
+  "tiposDeEfeito": {
+    "revela": "Exibe a(s) pergunta(s) alvo quando a condição é satisfeita.",
+    "oculta": "Oculta a(s) pergunta(s) alvo.",
+    "peso_locacional": "Atribui peso (0/1/2) ao fator locacional quando resposta = Sim.",
+    "vedacao": "Marca fator de vedação/restrição ativo.",
+    "define_competencia": "Define o status de competência municipal.",
+    "define_dispensa": "Marca o caminho de Dispensa.",
+    "aciona_tela": "Direciona para a tela de caracterização da modalidade.",
+    "forca_modalidade": "Sobrepõe a modalidade calculada (exceções do Módulo 4.2).",
+    "pula": "Salta para a pergunta/seção indicada."
+  },
+  "operadoresCondicao": {
+    "exemplo_simples": { "pergunta": "ID", "igual": "valor" },
+    "exemplo_e": { "e": [ { "pergunta": "A", "igual": "Sim" }, { "pergunta": "B", "igual": "Nao" } ] },
+    "exemplo_ou": { "ou": [ { "pergunta": "A", "igual": "Sim" }, { "pergunta": "B", "igual": "Sim" } ] }
+  },
+  "matrizes": {
+    "pesosLocacionais": {
+      "uc_protecao_integral": 2,
+      "supressao_area_prioritaria": 2,
+      "sitios_ramsar": 2,
+      "supressao_veg_nativa": 1,
+      "zona_amortecimento_uc_pi": 1,
+      "uc_uso_sustentavel": 1,
+      "reserva_biosfera": 1,
+      "corredor_ecologico": 1,
+      "drenagem_montante_classe_especial": 1,
+      "captacao_area_conflito": 1,
+      "alta_potencialidade_cavidades": 1
+    },
+    "classePorPorteEPotencial": {
+      "P": { "P": 1, "M": 2, "G": 4 },
+      "M": { "P": 1, "M": 3, "G": 5 },
+      "G": { "P": 1, "M": 4, "G": 6 }
+    },
+    "modalidadePorClasseEFatorLocacional": {
+      "0": { "1": "LAS_CADASTRO", "2": "LAS_CADASTRO", "3": "LAS_RAS", "4": "LAC1", "5": "LAC2", "6": "LAC2" },
+      "1": { "1": "LAS_CADASTRO", "2": "LAS_RAS", "3": "LAC1", "4": "LAC2", "5": "LAC2", "6": "LAT" },
+      "2": { "1": "LAS_RAS", "2": "LAC1", "3": "LAC2", "4": "LAC2", "5": "LAT", "6": "LAT" }
+    },
+    "regraFatorLocacional": "fatorLocacional = max(peso dos critérios respondidos 'Sim'); 0 se nenhum.",
+    "regraClassePredominante": "classe do empreendimento = MAIOR classe entre as atividades listadas."
+  },
+  "modalidades": [
+    { "id": "LAS_CADASTRO", "nome": "LAS - Cadastro", "tela": "Tela 4 - LAS Cadastro" },
+    { "id": "LAS_RAS", "nome": "LAS - RAS", "tela": "Tela 5 - LAS RAS" },
+    { "id": "LAC1", "nome": "LAC nível 1", "tela": "Tela 6 - LA" },
+    { "id": "LAC2", "nome": "LAC nível 2", "tela": "Tela 6 - LA" },
+    { "id": "LAT", "nome": "Trifásico (LP/LI/LO)", "tela": "Tela 6 - LA" },
+    { "id": "DISPENSA", "nome": "Dispensa de Licenciamento", "tela": "Tela 10 - Dispensa" },
+    { "id": "TRANSPORTE", "nome": "LAS Cadastro - Transporte de perigosos", "tela": "Tela 8 - Transporte" }
+  ],
+  "secoes": [
+    {
+      "id": "FRONT",
+      "titulo": "Triagem inicial",
+      "perguntas": [
+        {
+          "id": "FRONT_LISTADA",
+          "codigo": "CÓD-01013",
+          "texto": "A atividade executada no empreendimento está listada na DN nº 217/2017?",
+          "tipo": "boolean",
+          "obrigatoria": true,
+          "opcoes": [ { "valor": "Sim", "rotulo": "Sim" }, { "valor": "Nao", "rotulo": "Não" } ],
+          "efeitos": [
+            { "tipo": "define_dispensa", "quando": "Nao", "valor": true, "destino": "Tela 10 - Dispensa" },
+            { "tipo": "revela", "quando": "Sim", "alvo": ["FRONT_TIPO_SOLICITACAO"] }
+          ]
+        },
+        {
+          "id": "FRONT_TIPO_SOLICITACAO",
+          "codigo": "CÓD-05143",
+          "texto": "Marque o tipo da solicitação:",
+          "tipo": "enum",
+          "obrigatoria": true,
+          "opcoes": [
+            { "valor": "RENOV_OPERACAO", "rotulo": "Solicitação para renovação de ato autorizativo (licença ou autorização) referente à fase de operação." },
+            { "valor": "CORRETIVA", "rotulo": "Solicitação de licença corretiva em razão de vencimento de ato autorizativo referente à renovação." },
+            { "valor": "JA_DETENTOR", "rotulo": "Solicitação para obtenção de licença ambiental de empreendimento já detentor de Licença Prévia ou Licença de Instalação." },
+            { "valor": "AMPLIACAO", "rotulo": "Solicitação de licença para ampliação de empreendimento." },
+            { "valor": "NOVA", "rotulo": "Nova solicitação." }
+          ],
+          "efeitos": [
+            { "tipo": "revela", "quando": "NOVA", "alvo": ["FRONT_PEDIDO_ANTERIOR"] },
+            { "tipo": "aciona_tela", "quando": "RENOV_OPERACAO", "alvo": "Tela 7 - Renovação" }
+          ]
+        },
+        {
+          "id": "FRONT_PEDIDO_ANTERIOR",
+          "codigo": "CÓD-05163",
+          "texto": "Houve algum outro pedido de licenciamento ambiental para o empreendimento anteriormente a 05/11/2019?",
+          "tipo": "boolean",
+          "obrigatoria": true,
+          "visivelQuando": { "pergunta": "FRONT_TIPO_SOLICITACAO", "igual": "NOVA" },
+          "opcoes": [ { "valor": "Sim", "rotulo": "Sim" }, { "valor": "Nao", "rotulo": "Não" } ]
+        },
+        {
+          "id": "FRONT_TRANSPORTE",
+          "codigo": "CÓD-02001",
+          "texto": "Trata-se de atividade que abrange somente o transporte rodoviário de produtos perigosos (Código F-02-01-1)?",
+          "tipo": "boolean",
+          "obrigatoria": true,
+          "opcoes": [ { "valor": "Sim", "rotulo": "Sim" }, { "valor": "Nao", "rotulo": "Não" } ],
+          "efeitos": [
+            { "tipo": "aciona_tela", "quando": "Sim", "alvo": "Tela 8 - Transporte" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "TELA1_MODULO1",
+      "titulo": "Módulo 1 — Critérios locacionais de enquadramento (consultar IDE-Sisema)",
+      "perguntas": [
+        { "id": "LOC_UC_PI", "texto": "O empreendimento está/estará localizado em Unidade de Conservação de Proteção Integral, nas hipóteses previstas em Lei?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 2 } ] },
+        { "id": "LOC_ZONA_AMORT", "texto": "Está/estará em zona de amortecimento de UC de Proteção Integral, ou na faixa de 3 km do entorno (sem zona de amortecimento por Plano de Manejo); excluídas áreas urbanas?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_UC_US", "texto": "Está/estará localizado em UC de Uso Sustentável, exceto APA?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_APA", "texto": "O empreendimento está/estará localizado em Área de Proteção Ambiental (APA)?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "revela", "quando": "Sim", "alvo": ["LOC_APA_NOME"] } ] },
+        { "id": "LOC_APA_NOME", "texto": "Se SIM, informar o nome da APA:", "tipo": "texto", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_APA", "igual": "Sim" } },
+        { "id": "LOC_RESERVA_BIOSFERA", "texto": "Está/estará localizado em Reserva da Biosfera, excluídas as áreas urbanas?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_CORREDOR", "texto": "Está/estará localizado em Corredor Ecológico formalmente instituído?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_RAMSAR", "texto": "Está/estará localizado em áreas designadas como Sítios Ramsar?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 2 } ] },
+        { "id": "LOC_DRENAGEM_ESPECIAL", "texto": "Está/estará localizado em área de drenagem a montante de trecho de curso d'água enquadrado em classe especial?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_CAPTACAO_CONFLITO", "texto": "Há/haverá captação de água superficial em Área de Conflito por uso de recursos hídricos?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_CAVIDADES", "texto": "Está/estará em área de alto ou muito alto grau de potencialidade de ocorrência de cavidades (CECAV-ICMBio)?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 }, { "tipo": "revela", "quando": "Nao", "alvo": ["LOC_AREA_URBANIZADA"] } ] },
+        { "id": "LOC_AREA_URBANIZADA", "texto": "O empreendimento e seu entorno de 250 m estão/estarão em área totalmente urbanizada?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_CAVIDADES", "igual": "Nao" }, "efeitos": [ { "tipo": "revela", "quando": "Nao", "alvo": ["LOC_IMPACTO_CAVIDADES"] } ] },
+        { "id": "LOC_IMPACTO_CAVIDADES", "texto": "Se NÃO, a atividade terá impacto real ou potencial sobre cavidades naturais subterrâneas na ADA ou no entorno de 250 m?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_AREA_URBANIZADA", "igual": "Nao" } },
+        { "id": "LOC_SUPRESSAO", "texto": "Haverá supressão de vegetação?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "revela", "quando": "Sim", "alvo": ["LOC_SUPRESSAO_REGULAR"] } ] },
+        { "id": "LOC_SUPRESSAO_REGULAR", "texto": "Se SIM, essa intervenção se encontra regularizada?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_SUPRESSAO", "igual": "Sim" }, "efeitos": [ { "tipo": "revela", "quando": "Nao", "alvo": ["LOC_SUPRESSAO_NATIVA", "LOC_SUPRESSAO_PRIORITARIA"] } ] },
+        { "id": "LOC_SUPRESSAO_NATIVA", "texto": "Se NÃO regularizada, haverá supressão de vegetação nativa, exceto árvores isoladas?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_SUPRESSAO_REGULAR", "igual": "Nao" }, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_SUPRESSAO_PRIORITARIA", "texto": "Se NÃO regularizada, haverá supressão de vegetação nativa em áreas prioritárias (importância biológica extrema/especial), exceto árvores isoladas?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_SUPRESSAO_REGULAR", "igual": "Nao" }, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 2 } ] },
+        { "id": "LOC_ARVORES_ISOLADAS", "texto": "Haverá corte ou aproveitamento de árvores isoladas nativas vivas?", "tipo": "boolean", "obrigatoria": true },
+        { "id": "LOC_SUPRESSAO_PASSADA", "texto": "Houve supressão de vegetação em momento posterior a 22 de julho de 2008?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "revela", "quando": "Sim", "alvo": ["LOC_SUPRESSAO_PASSADA_REGULAR"] } ] },
+        { "id": "LOC_SUPRESSAO_PASSADA_REGULAR", "texto": "Se SIM, essa intervenção se encontra regularizada?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_SUPRESSAO_PASSADA", "igual": "Sim" }, "efeitos": [ { "tipo": "revela", "quando": "Nao", "alvo": ["LOC_SUPRESSAO_PASSADA_NATIVA", "LOC_SUPRESSAO_PASSADA_PRIORITARIA"] } ] },
+        { "id": "LOC_SUPRESSAO_PASSADA_NATIVA", "texto": "Se NÃO regularizada, ocorreu supressão de vegetação nativa, exceto árvores isoladas?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_SUPRESSAO_PASSADA_REGULAR", "igual": "Nao" }, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 1 } ] },
+        { "id": "LOC_SUPRESSAO_PASSADA_PRIORITARIA", "texto": "Se NÃO regularizada, ocorreu supressão de vegetação nativa em áreas prioritárias (importância biológica extrema/especial)?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "LOC_SUPRESSAO_PASSADA_REGULAR", "igual": "Nao" }, "efeitos": [ { "tipo": "peso_locacional", "quando": "Sim", "valor": 2 } ] }
+      ]
+    },
+    {
+      "id": "TELA2_MODULO2",
+      "titulo": "Módulo 2 — Fatores de restrição ou vedação (consultar IDE-Sisema)",
+      "perguntas": [
+        { "id": "VED_RIO_PP", "texto": "Haverá intervenção em rio de preservação permanente que se enquadre nas proibições do art. 3º da Lei Estadual nº 15.082/04?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "vedacao", "quando": "Sim", "fator": "RIO_PRESERVACAO_PERMANENTE" } ] },
+        { "id": "VED_IMPACTO", "texto": "O empreendimento tem/terá impacto em:", "tipo": "multiselect", "obrigatoria": true, "opcoes": [
+            { "valor": "TERRA_INDIGENA", "rotulo": "Terra indígena" },
+            { "valor": "TERRA_QUILOMBOLA", "rotulo": "Terra quilombola" },
+            { "valor": "ASA_AVIFAUNA", "rotulo": "Área de Segurança Aeroportuária com natureza atrativa de avifauna" },
+            { "valor": "BEM_CULTURAL", "rotulo": "Bem cultural acautelado" },
+            { "valor": "OUTROS", "rotulo": "Outros (especificar)" },
+            { "valor": "NAO_SE_APLICA", "rotulo": "Não se aplica" }
+          ], "efeitos": [ { "tipo": "vedacao", "quando": "TERRA_INDIGENA|TERRA_QUILOMBOLA|ASA_AVIFAUNA|BEM_CULTURAL", "fator": "RESTRICAO_TERRITORIAL" } ] },
+        { "id": "VED_EFLUENTE_ESPECIAL", "texto": "Haverá lançamento de efluentes ou disposição de resíduos tratados em águas de Classe Especial?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "vedacao", "quando": "Sim", "fator": "CLASSE_ESPECIAL_LANCAMENTO" } ] },
+        { "id": "VED_MANANCIAL", "texto": "Está localizado em mananciais a montante do ponto de captação, com águas classificadas na Classe Especial?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "vedacao", "quando": "Sim", "fator": "MANANCIAL_CLASSE_ESPECIAL" } ] },
+        { "id": "VED_VETOR_NORTE", "texto": "Está localizado nos limites do Vetor Norte, APA Carste e/ou APA Morro da Pedreira? (itens 5–9 só para Vetor Norte RMBH)", "tipo": "boolean", "obrigatoria": false, "efeitos": [ { "tipo": "revela", "quando": "Sim", "alvo": ["VED_SAP", "VED_FASE", "VED_VULNERABILIDADE", "VED_APA_CARSTE"] } ] },
+        { "id": "VED_SAP", "texto": "Está localizado no Sistema de Áreas Protegidas (SAP)?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "VED_VETOR_NORTE", "igual": "Sim" } },
+        { "id": "VED_FASE", "texto": "Em qual fase se encontra o empreendimento?", "tipo": "enum", "obrigatoria": false, "visivelQuando": { "pergunta": "VED_VETOR_NORTE", "igual": "Sim" }, "opcoes": [ { "valor": "PROJETO", "rotulo": "Projeto" }, { "valor": "INSTALACAO", "rotulo": "Instalação" }, { "valor": "OPERACAO", "rotulo": "Instalado ou em operação" } ] },
+        { "id": "VED_VULNERABILIDADE", "texto": "Está em área de vulnerabilidade natural muito alta/alta no ZEE?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "VED_VETOR_NORTE", "igual": "Sim" } },
+        { "id": "VED_APA_CARSTE", "texto": "Está na APA Carste ou na APA Morro da Pedreira?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "VED_VETOR_NORTE", "igual": "Sim" } }
+      ]
+    },
+    {
+      "id": "TELA2_MODULO3",
+      "titulo": "Módulo 3 — Outras intervenções",
+      "perguntas": [
+        { "id": "INT_APP_SEM_SUPRESSAO", "texto": "Haverá intervenção em APP sem supressão de vegetação nativa?", "tipo": "boolean", "obrigatoria": true },
+        { "id": "INT_DESTOCA", "texto": "Haverá destoca em área remanescente de supressão de vegetação nativa?", "tipo": "boolean", "obrigatoria": true },
+        { "id": "INT_MANEJO", "texto": "Haverá manejo sustentável da vegetação nativa?", "tipo": "boolean", "obrigatoria": true },
+        { "id": "INT_LENHOSO", "texto": "Haverá aproveitamento de material lenhoso?", "tipo": "boolean", "obrigatoria": true },
+        { "id": "INT_RL", "texto": "Houve intervenção em Reserva Legal posterior a 22/07/2008?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "revela", "quando": "Sim", "alvo": ["INT_RL_RECOMP"] } ] },
+        { "id": "INT_RL_RECOMP", "texto": "Se SIM, foi efetuada a recomposição da Reserva Legal?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "INT_RL", "igual": "Sim" } },
+        { "id": "INT_APP", "texto": "Houve intervenção em APP posterior a 22/07/2008?", "tipo": "boolean", "obrigatoria": true, "efeitos": [ { "tipo": "revela", "quando": "Sim", "alvo": ["INT_APP_REGULAR"] } ] },
+        { "id": "INT_APP_REGULAR", "texto": "Se SIM, a intervenção se encontra regularizada?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "INT_APP", "igual": "Sim" } },
+        { "id": "INT_RECURSO_HIDRICO", "texto": "O empreendimento faz/fará uso ou intervenção em recurso hídrico?", "tipo": "boolean", "obrigatoria": true }
+      ]
+    },
+    {
+      "id": "TELA3_MODULO4",
+      "titulo": "Módulo 4 — Classificação das atividades",
+      "perguntas": [
+        { "id": "ATIV_LISTA", "texto": "Dados das atividades do empreendimento (código + parâmetro + quantidade).", "tipo": "lista_atividades", "obrigatoria": true, "itemSchema": { "codigo": "N-XX-YY-Z", "descricao": "auto (catálogo)", "potencialGeral": "auto (catálogo) P|M|G", "parametro": "auto (catálogo)", "quantidade": "numero", "unidade": "auto (catálogo)", "porteCalculado": "P|M|G", "classeCalculada": "1..6" }, "efeitos": [ { "tipo": "calculo", "valor": "classePredominante = max(classeCalculada)" } ] },
+        { "id": "EXC_AEROPORTO", "texto": "4.2 — Ampliação de aeroporto regional regularizado (E-01-09-0), baixo impacto (Res. Conama 470/2015)?", "tipo": "boolean", "obrigatoria": false, "efeitos": [ { "tipo": "forca_modalidade", "quando": "Sim", "regra": "ver manual" } ] },
+        { "id": "EXC_PCH", "texto": "4.2 — Recapacitação/repotenciação de PCH (E-02-01-1)?", "tipo": "boolean", "obrigatoria": false, "efeitos": [ { "tipo": "revela", "quando": "Sim", "alvo": ["EXC_PCH_RESERVATORIO", "EXC_PCH_OUTORGA", "EXC_PCH_30MW"] } ] },
+        { "id": "EXC_PCH_RESERVATORIO", "texto": "Haverá modificação na área do reservatório e no trecho de vazão reduzida (TVR)?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "EXC_PCH", "igual": "Sim" } },
+        { "id": "EXC_PCH_OUTORGA", "texto": "Serão necessárias alterações na outorga vigente?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "EXC_PCH", "igual": "Sim" } },
+        { "id": "EXC_PCH_30MW", "texto": "A capacidade instalada ultrapassará 30 MW?", "tipo": "boolean", "obrigatoria": false, "visivelQuando": { "pergunta": "EXC_PCH", "igual": "Sim" } },
+        { "id": "EXC_EIA_RIMA", "texto": "4.2 — Processo com obrigatoriedade de EIA/RIMA (destilação álcool D-01-08-2; aterro E-03-07-7 > 20 t/dia; G-01/02/03 > 1.000 ha; A-02-03-8 minério de ferro; utilidade pública c/ Mata Atlântica; minerária c/ Mata Atlântica; vulnerabilidade Vetor Norte)?", "tipo": "multiselect", "obrigatoria": false, "efeitos": [ { "tipo": "forca_modalidade", "quando": "qualquer", "regra": "EIA/RIMA → LAT" } ] },
+        { "id": "EXC_POSTO_15M3", "texto": "4.2 — Sistema de abastecimento aéreo de combustíveis até 15 m³, exclusivo do detentor?", "tipo": "boolean", "obrigatoria": false, "efeitos": [ { "tipo": "forca_modalidade", "quando": "Sim", "regra": "ver manual" } ] },
+        { "id": "EXC_CERCADINHO", "texto": "4.2 — Atividade E-05-07-0 (entorno da Estação Ecológica de Cercadinho) com potencial de afetar a visibilidade da Serra do Curral?", "tipo": "boolean", "obrigatoria": false }
+      ]
+    },
+    {
+      "id": "MODULO5_CARACTERIZACAO",
+      "titulo": "Módulo 5 — Caracterização (roteada pela modalidade resultante)",
+      "observacao": "Seções de COLETA DE DADOS (não branching). A tela exibida depende de modalidadeFinal. Grupos de campos comuns abaixo.",
+      "telasPorModalidade": {
+        "LAS_CADASTRO": "Tela 4 - LAS Cadastro",
+        "LAS_RAS": "Tela 5 - LAS RAS",
+        "LAC1": "Tela 6 - LA",
+        "LAC2": "Tela 6 - LA",
+        "LAT": "Tela 6 - LA",
+        "RENOVACAO": "Tela 7 - Renovação",
+        "TRANSPORTE": "Tela 8 - Transporte",
+        "DISPENSA": "Tela 10 - Dispensa"
+      },
+      "gruposDeCampos": [
+        { "grupo": "1. Identificação do empreendedor", "campos": ["Razão Social", "CNPJ/CPF", "Endereço", "Complemento", "Caixa Postal", "Telefone", "Desenvolvido por (PF/PJ/Proprietário/Arrendatário/Posseiro/Outros)"] },
+        { "grupo": "2. Identificação do empreendimento", "campos": ["Razão Social", "CNPJ/CPF", "Responsável legal", "Endereço", "Referência do local", "Microempresa/MEI", "Agricultor/Empreendedor Familiar Rural", "Associação/cooperativa de catadores", "RPPN > 20% da área"] },
+        { "grupo": "3. Endereço para correspondência", "campos": ["Igual ao empreendedor/empreendimento/outro", "Endereço", "Complemento", "Telefone"] },
+        { "grupo": "4. Caracterização específica", "campos": ["Varia por modalidade — ver telas 4-8 da planilha"] }
+      ]
+    }
+  ]
+}

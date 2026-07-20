@@ -1,0 +1,72 @@
+CORREÇÕES:
+
+1. Quando muda de um fluxo para o outro, quando o fluxo atual já foi respondido anteriormente no mesmo documemto, mas por decisão do usuário,
+ele decide responder novamente as perguntas após as mudanças, as respostas ficam salvas desde a vez anterior. Tem que haver a lógica para que 
+Ao mudar de fluxo, mudar a resposta de qualquer pergunta que leve a outra e coisas do tipo, essas respostas anteriores sejam apagadas.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+RESOLVIDOS:
+
+1. Não está calculando e inserindo a Fase Licenciamento no grid enquadramento mapa
+
+2. Terminar Grid Lista de Custos - OK
+
+3. Não pode editar nada enquanto não apertar no botão 'editar' - OK
+
+4. Card cód-05165 está com ordem hierárquica errada, quando abre o formulário, a pergunta fica no primeiro nível, 
+sendo que ela é nível 4 - OK
+
+5. No popup de Parâmetros da Atividade, um dos radios PRECISAM ser selecionados obrigatoriamente - OK
+
+6. Erro das perguntas da etapa2 e etapa2-mapa
+
+7. Os desenhos do mapa de um outro documento estão aparecendo em outro documento diferente. 
+
+Como se as informações do mapa estivesse 'fixa' ou compartilhada, o que é incorreto, 
+
+porque cada documento aberto precisa ter suas respostas/desenhos individuais - OK
+
+8. Passar de button para radios as opções filhas de op2 do card-1
+
+9. Melhorar o CSS dos PopUps - OK 
+
+10. Melhorar o CSS do Geometrias Delimitadas - OK
+
+11. Em algumas situações está deixando o user para passar para uma próxima etapa, mesmo que perguntas obrigatórias não tenham sido 
+respondidas. - OK 
+
+12. Eu cometi um leve erro no meu código:
+O card-22 era pra aparecer em formato popup ao clicar em 'nao' no card-1, não em formato card. 
+Arrume para que siga a lógica parecida ao clicar em 'sim' no card-7.
+
+13. Outro erro é que ao clicar nas alternativas que abrem o popup (ex: ao clicar em 'sim' no card-7) 
+e apertar em 'sim' desse popup que aparece, o usuário não é direcionado para a etapa2 que contém só o select de atividades e a lista de atividades. 
+Ele é direcionado para a etapa2-mapa, 
+com todas as respostas salvas de uma vez anterior que ele respondeu a etapa2-mapa nesse mesmo documento, porém resolveu mudar as respostas
+do início.
+
+14. Ajustar a etapa3-criterios para ficar com a hierarquia correta e adicionar obrigatoriedade nas perguntas
+
+15. Botão de adicionar na etapa2 abre o popup mesmo sem selecionar uma atividade. Se estiver selecionado o 'Selecione...', 
+o popup não deve abrir, só selecionar a atividade.
+
+16. Verificar se aqauela atividade selecionada pelo user no select das etapa2 e etapa2-mapa,
+já está no gridAtividades (pode olhar pelo código da atividade). Se estiver, 
+não permitir inserir novamente no grid. 
+
+17. Ao invés da data de vencimento ser em até 10 dias, como:
+vencimento: valorDae != null ? calcularVencimentoDae() : '',
+A data ser até 31/12 do ano da solicitação (ex: se for solicitado em 2027, a data de vencimento ser até 31/12/2027)
+
+18. As respostas das seguintes perguntas não estão sendo salvas:
+card-104-nome
+card-110-urbanizada
+card-111-regular
+card-113-regular
+card-113-nativa
+card-113-prioritaria
+
+19. Ainda persiste o problema dos desenhos do mapa não estarem sendo salvos, e todas as opções do select sumirem (bug)
+
+20. ctrlAnexos parece não estar funcionando

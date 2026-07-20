@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POC — Questionário FCE (Análise de Enquadramento)</title>
+  <style>
+    :root {
+      --azul: #1f6fb2;
+      --azul-esc: #155080;
+      --azul-claro: #e8f2fb;
+      --borda: #cfe0ee;
+      --verde: #137333;
+      --verde-bg: #e6f4ea;
+      --vermelho: #c5221f;
+      --vermelho-bg: #fce8e6;
+      --amarelo: #a06b00;
+      --amarelo-bg: #fff6e0;
+      --cinza: #5f6c7b;
+      --txt: #1a2b3c;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+      color: var(--txt);
+      background: #f4f7fa
+    }
+
+    header {
+      background: linear-gradient(90deg, var(--azul-esc), var(--azul));
+      color: #fff;
+      padding: 16px 22px
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px
+    }
+
+    header p {
+      margin: 4px 0 0;
+      font-size: 12.5px;
+      opacity: .9
+    }
+
+    .btn-reset {
+      margin-top: 10px;
+      font-size: 12.5px;
+      background: #fff;
+      color: var(--azul-esc);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-weight: 600
+    }
+
+    .btn-reset:hover {
+      background: var(--azul-claro)
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 18px;
+      padding: 18px;
+      max-width: 1280px;
+      margin: 0 auto
+    }
+
+    @media(max-width:980px) {
+      .wrap {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .col-form {
+      min-width: 0
+    }
+
+    .secao {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow: hidden
+    }
+
+    .secao>h2 {
+      margin: 0;
+      background: var(--azul-claro);
+      color: var(--azul-esc);
+      font-size: 14px;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--borda)
+    }
+
+    .q {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eef3f8
+    }
+
+    .q:last-child {
+      border-bottom: none
+    }
+
+    .q .codigo {
+      display: inline-block;
+      background: var(--azul);
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+      letter-spacing: .3px
+    }
+
+    .q .texto {
+      font-size: 13.5px;
+      line-height: 1.45
+    }
+
+    .q .req {
+      color: var(--vermelho);
+      font-weight: 700
+    }
+
+    .opts {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .opts.col {
+      flex-direction: column
+    }
+
+    label.opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-size: 13px;
+      background: #fafcfe;
+      border: 1px solid var(--borda);
+      border-radius: 7px;
+      padding: 7px 11px;
+      cursor: pointer;
+      flex: 0 0 auto
+    }
+
+    label.opt:hover {
+      background: var(--azul-claro)
+    }
+
+    label.opt input {
+      margin-top: 2px
+    }
+
+    label.opt.full {
+      flex: 1 1 100%
+    }
+
+    input[type=text],
+    input[type=number],
+    select {
+      font-size: 13px;
+      padding: 6px 9px;
+      border: 1px solid var(--borda);
+      border-radius: 6px;
+      width: 100%;
+      max-width: 340px;
+      font-family: inherit
+    }
+
+    .badge-peso {
+      font-size: 10.5px;
+      color: var(--amarelo);
+      background: var(--amarelo-bg);
+      border-radius: 4px;
+      padding: 1px 6px;
+      margin-left: 6px
+    }
+
+    .secao-lock {
+      opacity: .55
+    }
+
+    .lock-msg {
+      font-size: 12px;
+      color: var(--cinza);
+      padding: 12px 16px;
+      font-style: italic
+    }
+
+    .ativ-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 90px 70px 30px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px
+    }
+
+    .ativ-row .calc {
+      font-size: 12px;
+      color: var(--cinza)
+    }
+
+    .ativ-row .classe {
+      font-weight: 700;
+      color: var(--azul-esc);
+      text-align: center
+    }
+
+    .btn {
+      font-size: 12.5px;
+      border: 1px solid var(--azul);
+      background: #fff;
+      color: var(--azul);
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer
+    }
+
+    .btn:hover {
+      background: var(--azul-claro)
+    }
+
+    .btn-rm {
+      border-color: #ddd;
+      color: var(--vermelho);
+      padding: 4px 9px
+    }
+
+    .col-res {
+      position: sticky;
+      top: 18px;
+      align-self: start
+    }
+
+    .res {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      overflow: hidden
+    }
+
+    .res>h2 {
+      margin: 0;
+      background: var(--azul-esc);
+      color: #fff;
+      font-size: 14px;
+      padding: 11px 16px
+    }
+
+    .res-body {
+      padding: 14px 16px
+    }
+
+    .kv {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      padding: 7px 0;
+      border-bottom: 1px dashed #e6edf4
+    }
+
+    .kv:last-child {
+      border-bottom: none
+    }
+
+    .kv .k {
+      color: var(--cinza)
+    }
+
+    .kv .v {
+      font-weight: 600;
+      text-align: right
+    }
+
+    .modal-box {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 15px
+    }
+
+    .m-ok {
+      background: var(--verde-bg);
+      color: var(--verde)
+    }
+
+    .m-bloq {
+      background: var(--vermelho-bg);
+      color: var(--vermelho)
+    }
+
+    .m-disp {
+      background: var(--amarelo-bg);
+      color: var(--amarelo)
+    }
+
+    .m-wait {
+      background: #eef3f8;
+      color: var(--cinza)
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px
+    }
+
+    .chip {
+      font-size: 11px;
+      background: var(--vermelho-bg);
+      color: var(--vermelho);
+      border-radius: 10px;
+      padding: 2px 8px
+    }
+
+    .chip.loc {
+      background: var(--amarelo-bg);
+      color: var(--amarelo)
+    }
+
+    .tela-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      background: var(--azul-claro);
+      color: var(--azul-esc);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-weight: 600
+    }
+
+    .nota {
+      font-size: 11px;
+      color: var(--cinza);
+      margin-top: 10px;
+      line-height: 1.4
+    }
+
+    .prog {
+      font-size: 11px;
+      color: var(--verde);
+      font-weight: 600;
+      float: right
+    }
+
+    footer {
+      font-size: 11px;
+      color: var(--cinza);
+      text-align: center;
+      padding: 8px 0 24px
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Questionário FCE — Análise de Enquadramento <span style="opacity:.7;font-weight:400">(Prova de Conceito)</span>
+    </h1>
+    <p>Atividade BPMN “5 - Análise de FCE” · preenchido pelo analista · lógica derivada do FCE v12.0 + DN COPAM 217/2017
+      + DN 213/2017 (alt. 250/2024)</p>
+    <button class="btn-reset" id="btnReset">↺ Limpar tudo</button>
+  </header>
+
+  <div class="wrap">
+    <div class="col-form" id="form"></div>
+    <div class="col-res">
+      <div class="res">
+        <h2>Enquadramento (ao vivo)</h2>
+        <div class="res-body" id="res"></div>
+      </div>
+      <p class="nota">POC para validar a lógica condicional e o cálculo. Revelação progressiva: cada módulo aparece
+        quando o anterior estiver completo. Catálogo de atividades reduzido (amostra) — no produto virá da base oficial
+        da DN.</p>
+    </div>
+  </div>
+  <footer>Silo Sistema · Notpaper · Módulo de Licenciamento Ambiental — POC do questionário FCE</footer>
+
+  <script>
+    /* ============ 1) MATRIZES E CATÁLOGO (DN COPAM 217/2017) ============ */
+    const MATRIZ_CLASSE = { P: { P: 1, M: 2, G: 4 }, M: { P: 1, M: 3, G: 5 }, G: { P: 1, M: 4, G: 6 } };
+    const MATRIZ_MODALIDADE = {
+      0: { 1: 'LAS-Cadastro', 2: 'LAS-Cadastro', 3: 'LAS-RAS', 4: 'LAC1', 5: 'LAC2', 6: 'LAC2' },
+      1: { 1: 'LAS-Cadastro', 2: 'LAS-RAS', 3: 'LAC1', 4: 'LAC2', 5: 'LAC2', 6: 'LAT' },
+      2: { 1: 'LAS-RAS', 2: 'LAC1', 3: 'LAC2', 4: 'LAC2', 5: 'LAT', 6: 'LAT' }
+    };
+    const TELA_MODALIDADE = {
+      'LAS-Cadastro': 'Tela 4 — LAS Cadastro', 'LAS-RAS': 'Tela 5 — LAS RAS',
+      'LAC1': 'Tela 6 — LA (Concomitante)', 'LAC2': 'Tela 6 — LA (Concomitante)',
+      'LAT': 'Tela 6 — LA (Trifásico)', 'DISPENSA': 'Tela 10 — Dispensa',
+      'TRANSPORTE': 'Tela 8 — Transporte', 'RENOVAÇÃO': 'Tela 7 — Renovação'
+    };
+    const CATALOGO = [
+      { cod: 'A-02-09-7', desc: 'Extração de rocha p/ britas', geral: 'M', un: 't/ano', faixaP: 30000, faixaM: 200000 },
+      { cod: 'A-03-01-8', desc: 'Extração de areia e cascalho (constr. civil)', geral: 'M', un: 'm³/ano', faixaP: 10000, faixaM: 50000 },
+      { cod: 'A-04-01-4', desc: 'Extração de água mineral/potável de mesa', geral: 'P', un: 'L/ano', faixaP: 6000000, faixaM: 15000000 },
+      { cod: 'B-01-01-5', desc: 'Britamento de pedras para construção', geral: 'M', un: 'ha (área útil)', faixaP: 3, faixaM: 10 },
+      { cod: 'B-01-03-1', desc: 'Fabricação de cerâmica vermelha', geral: 'P', un: 't/ano', faixaP: 12000, faixaM: 50000 },
+      { cod: 'OUTRA', desc: 'Outra atividade (definir potencial e porte manualmente)', geral: null, un: '', manual: true }
+    ];
+
+    /* ============ 2) PERGUNTAS (derivadas do schema JSON) ============ */
+    const PESOS = {
+      LOC_UC_PI: 2, LOC_ZONA_AMORT: 1, LOC_UC_US: 1, LOC_RESERVA_BIOSFERA: 1, LOC_CORREDOR: 1,
+      LOC_RAMSAR: 2, LOC_DRENAGEM_ESPECIAL: 1, LOC_CAPTACAO_CONFLITO: 1, LOC_CAVIDADES: 1,
+      LOC_SUPRESSAO_NATIVA: 1, LOC_SUPRESSAO_PRIORITARIA: 2,
+      LOC_SUPRESSAO_PASSADA_NATIVA: 1, LOC_SUPRESSAO_PASSADA_PRIORITARIA: 2
+    };
+    const SN = [{ v: 'Sim', r: 'Sim' }, { v: 'Nao', r: 'Não' }];
+
+    const SECOES = [
+      {
+        id: 'FRONT', titulo: 'Triagem inicial', perguntas: [
+          { id: 'FRONT_LISTADA', cod: 'CÓD-01013', texto: 'A atividade executada no empreendimento está listada na DN nº 217/2017?', tipo: 'bool', req: true, opts: SN },
+          {
+            id: 'FRONT_TIPO', cod: 'CÓD-05143', texto: 'Marque o tipo da solicitação:', tipo: 'enum', req: true, visivel: { p: 'FRONT_LISTADA', ig: 'Sim' }, opts: [
+              { v: 'RENOV', r: 'Renovação de ato autorizativo (fase de operação).' },
+              { v: 'CORRETIVA', r: 'Licença corretiva por vencimento de ato referente à renovação.' },
+              { v: 'JA_DETENTOR', r: 'Obtenção de licença de empreendimento já detentor de LP ou LI.' },
+              { v: 'AMPLIACAO', r: 'Licença para ampliação de empreendimento.' },
+              { v: 'NOVA', r: 'Nova solicitação.' }]
+          },
+          { id: 'FRONT_ANTERIOR', cod: 'CÓD-05163', texto: 'Houve algum outro pedido de licenciamento para o empreendimento anteriormente a 05/11/2019?', tipo: 'bool', req: true, visivel: { p: 'FRONT_TIPO', ig: 'NOVA' }, opts: SN },
+          { id: 'FRONT_TRANSPORTE', cod: 'CÓD-02001', texto: 'Trata-se de atividade que abrange somente o transporte rodoviário de produtos perigosos (Código F-02-01-1)?', tipo: 'bool', req: true, visivel: { p: 'FRONT_LISTADA', ig: 'Sim' }, opts: SN }
+        ]
+      },
+      {
+        id: 'M1', titulo: 'Módulo 1 — Critérios locacionais (consultar IDE-Sisema)', visivel: { p: 'FRONT_TRANSPORTE', ig: 'Nao' }, perguntas: [
+          { id: 'LOC_UC_PI', texto: 'Localizado em Unidade de Conservação de Proteção Integral (hipóteses em Lei)?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_ZONA_AMORT', texto: 'Em zona de amortecimento de UC de Proteção Integral ou faixa de 3 km do entorno (excl. áreas urbanas)?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_UC_US', texto: 'Em UC de Uso Sustentável, exceto APA?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_APA', texto: 'Localizado em Área de Proteção Ambiental (APA)?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_APA_NOME', texto: 'Se SIM, informar o nome da APA:', tipo: 'text', visivel: { p: 'LOC_APA', ig: 'Sim' } },
+          { id: 'LOC_RESERVA_BIOSFERA', texto: 'Em Reserva da Biosfera (excl. áreas urbanas)?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_CORREDOR', texto: 'Em Corredor Ecológico formalmente instituído?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_RAMSAR', texto: 'Em áreas designadas como Sítios Ramsar?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_DRENAGEM_ESPECIAL', texto: 'Em área de drenagem a montante de curso d’água de classe especial?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_CAPTACAO_CONFLITO', texto: 'Captação de água superficial em Área de Conflito por uso de recursos hídricos?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_CAVIDADES', texto: 'Em área de alto/muito alto grau de potencialidade de cavidades (CECAV-ICMBio)?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_AREA_URBANIZADA', texto: 'O empreendimento e seu entorno de 250 m estão em área totalmente urbanizada?', tipo: 'bool', visivel: { p: 'LOC_CAVIDADES', ig: 'Nao' }, opts: SN },
+          { id: 'LOC_IMPACTO_CAVIDADES', texto: 'Se NÃO, terá impacto real/potencial sobre cavidades na ADA ou entorno de 250 m?', tipo: 'bool', visivel: { p: 'LOC_AREA_URBANIZADA', ig: 'Nao' }, opts: SN },
+          { id: 'LOC_SUPRESSAO', texto: 'Haverá supressão de vegetação?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_SUPRESSAO_REGULAR', texto: 'Se SIM, a intervenção se encontra regularizada?', tipo: 'bool', visivel: { p: 'LOC_SUPRESSAO', ig: 'Sim' }, opts: SN },
+          { id: 'LOC_SUPRESSAO_NATIVA', texto: 'Se NÃO regularizada: haverá supressão de vegetação nativa (exceto árvores isoladas)?', tipo: 'bool', visivel: { p: 'LOC_SUPRESSAO_REGULAR', ig: 'Nao' }, opts: SN },
+          { id: 'LOC_SUPRESSAO_PRIORITARIA', texto: 'Se NÃO regularizada: supressão de nativa em área prioritária (importância biológica extrema/especial)?', tipo: 'bool', visivel: { p: 'LOC_SUPRESSAO_REGULAR', ig: 'Nao' }, opts: SN },
+          { id: 'LOC_ARVORES', texto: 'Haverá corte/aproveitamento de árvores isoladas nativas vivas?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_SUP_PASSADA', texto: 'Houve supressão de vegetação posterior a 22/07/2008?', tipo: 'bool', req: true, opts: SN },
+          { id: 'LOC_SUP_PASSADA_REG', texto: 'Se SIM, a intervenção se encontra regularizada?', tipo: 'bool', visivel: { p: 'LOC_SUP_PASSADA', ig: 'Sim' }, opts: SN },
+          { id: 'LOC_SUPRESSAO_PASSADA_NATIVA', texto: 'Se NÃO regularizada: ocorreu supressão de nativa (exceto isoladas)?', tipo: 'bool', visivel: { p: 'LOC_SUP_PASSADA_REG', ig: 'Nao' }, opts: SN },
+          { id: 'LOC_SUPRESSAO_PASSADA_PRIORITARIA', texto: 'Se NÃO regularizada: supressão de nativa em área prioritária?', tipo: 'bool', visivel: { p: 'LOC_SUP_PASSADA_REG', ig: 'Nao' }, opts: SN }
+        ]
+      },
+      {
+        id: 'M2', titulo: 'Módulo 2 — Fatores de restrição ou vedação', dependeDe: 'M1', perguntas: [
+          { id: 'VED_RIO_PP', texto: 'Intervenção em rio de preservação permanente (art. 3º, Lei 15.082/04)?', tipo: 'bool', req: true, opts: SN, veda: 'Rio de Preservação Permanente' },
+          { id: 'VED_EFLUENTE', texto: 'Lançamento de efluentes/resíduos tratados em águas de Classe Especial?', tipo: 'bool', req: true, opts: SN, veda: 'Lançamento em Classe Especial' },
+          { id: 'VED_MANANCIAL', texto: 'Localizado em manancial a montante de captação (águas Classe Especial)?', tipo: 'bool', req: true, opts: SN, veda: 'Manancial Classe Especial' },
+          {
+            id: 'VED_IMPACTO', texto: 'O empreendimento tem/terá impacto em (marcar todos que se aplicam):', tipo: 'multi', req: true, opts: [
+              { v: 'TI', r: 'Terra indígena', veda: 'Terra Indígena' },
+              { v: 'TQ', r: 'Terra quilombola', veda: 'Terra Quilombola' },
+              { v: 'ASA', r: 'Área de Segurança Aeroportuária c/ avifauna', veda: 'ASA — avifauna' },
+              { v: 'BC', r: 'Bem cultural acautelado', veda: 'Bem cultural acautelado' },
+              { v: 'NA', r: 'Não se aplica' }]
+          }
+        ]
+      },
+      {
+        id: 'M3', titulo: 'Módulo 3 — Outras intervenções', dependeDe: 'M2', perguntas: [
+          { id: 'INT_APP_SS', texto: 'Intervenção em APP sem supressão de nativa?', tipo: 'bool', req: true, opts: SN },
+          { id: 'INT_DESTOCA', texto: 'Destoca em área remanescente de supressão?', tipo: 'bool', req: true, opts: SN },
+          { id: 'INT_MANEJO', texto: 'Manejo sustentável da vegetação nativa?', tipo: 'bool', req: true, opts: SN },
+          { id: 'INT_LENHOSO', texto: 'Aproveitamento de material lenhoso?', tipo: 'bool', req: true, opts: SN },
+          { id: 'INT_RL', texto: 'Intervenção em Reserva Legal posterior a 22/07/2008?', tipo: 'bool', req: true, opts: SN },
+          { id: 'INT_RL_REC', texto: 'Se SIM, foi efetuada a recomposição da RL?', tipo: 'bool', visivel: { p: 'INT_RL', ig: 'Sim' }, opts: SN },
+          { id: 'INT_APP', texto: 'Intervenção em APP posterior a 22/07/2008?', tipo: 'bool', req: true, opts: SN },
+          { id: 'INT_APP_REG', texto: 'Se SIM, a intervenção se encontra regularizada?', tipo: 'bool', visivel: { p: 'INT_APP', ig: 'Sim' }, opts: SN },
+          { id: 'INT_RH', texto: 'Uso ou intervenção em recurso hídrico?', tipo: 'bool', req: true, opts: SN }
+        ]
+      },
+      {
+        id: 'M4', titulo: 'Módulo 4 — Classificação das atividades', dependeDe: 'M3', perguntas: [
+          { id: 'ATIVIDADES', tipo: 'atividades' },
+          { id: 'EXC_EIA', texto: '4.2 — O processo tem obrigatoriedade de EIA/RIMA (exceções da DN, ex.: aterro > 20 t/dia, minério de ferro, Mata Atlântica, etc.)?', tipo: 'bool', opts: SN, forcaLAT: true },
+          { id: 'EXC_POSTO', texto: '4.2 — Sistema de abastecimento aéreo de combustíveis até 15 m³, exclusivo do detentor?', tipo: 'bool', opts: SN }
+        ]
+      }
+    ];
+
+    /* ============ 3) ESTADO + RENDER ============ */
+    const estado = {};
+    const atividades = [];
+
+    function visivelPergunta(cfg) {
+      if (!cfg.visivel) return true;
+      return estado[cfg.visivel.p] === cfg.visivel.ig;
+    }
+
+    /* Uma seção está completa quando todas as perguntas obrigatórias VISÍVEIS
+       estão respondidas (e, no Módulo 4, há ao menos uma atividade com classe). */
+    function secaoCompleta(sec) {
+      return sec.perguntas.every(q => {
+        if (q.tipo === 'atividades') { return atividades.some(a => classeAtividade(a).classe != null); }
+        if (!q.req) return true;
+        if (!visivelPergunta(q)) return true;
+        const v = estado[q.id];
+        if (q.tipo === 'multi') return Array.isArray(v) && v.length > 0;
+        return v !== undefined && v !== '';
+      });
+    }
+
+    /* Visibilidade progressiva: respeita a condição base (sec.visivel) e,
+       quando há dependeDe, só libera se a seção anterior estiver visível E completa. */
+    function visivelSecao(sec) {
+      if (sec.visivel && estado[sec.visivel.p] !== sec.visivel.ig) return false;
+      if (sec.dependeDe) {
+        const prev = SECOES.find(s => s.id === sec.dependeDe);
+        if (!prev) return true;
+        if (!visivelSecao(prev) || !secaoCompleta(prev)) return false;
+      }
+      return true;
+    }
+
+    /* Poda em cascata: remove o valor de qualquer pergunta/seção oculta,
+       para que respostas "fantasmas" não controlem etapas seguintes nem o cálculo. */
+    function pruneHidden() {
+      let changed = true, guard = 0;
+      while (changed && guard++ < 20) {
+        changed = false;
+        SECOES.forEach(sec => {
+          const secVis = visivelSecao(sec);
+          sec.perguntas.forEach(q => {
+            if (q.tipo === 'atividades') {
+              if (!secVis && atividades.length) { atividades.length = 0; changed = true; }
+              return;
+            }
+            const qVis = secVis && visivelPergunta(q);
+            if (!qVis && estado[q.id] !== undefined) { delete estado[q.id]; changed = true; }
+          });
+        });
+      }
+    }
+
+    function render() {
+      pruneHidden();
+      const form = document.getElementById('form');
+      form.innerHTML = '';
+      SECOES.forEach(sec => {
+        if (!visivelSecao(sec)) return;
+        const box = document.createElement('div'); box.className = 'secao';
+        const completa = secaoCompleta(sec);
+        box.innerHTML = '<h2>' + sec.titulo + (sec.dependeDe || sec.id !== 'FRONT' ? '<span class="prog">' + (completa ? '✓ completo' : 'em preenchimento') + '</span>' : '') + '</h2>';
+        sec.perguntas.forEach(q => {
+          if (q.tipo === 'atividades') { box.appendChild(renderAtividades()); return; }
+          if (!visivelPergunta(q)) return;
+          const div = document.createElement('div'); div.className = 'q';
+          let html = '<div class="texto">';
+          if (q.cod) html += '<span class="codigo">' + q.cod + '</span>';
+          html += q.texto + (q.req ? ' <span class="req">*</span>' : '');
+          if (PESOS[q.id]) html += '<span class="badge-peso">peso ' + PESOS[q.id] + '</span>';
+          html += '</div>';
+          div.innerHTML = html;
+          div.appendChild(renderInput(q));
+          box.appendChild(div);
+        });
+        form.appendChild(box);
+      });
+      // dica do próximo módulo bloqueado
+      const prox = SECOES.find(s => s.dependeDe && !visivelSecao(s) && visivelSecao(SECOES.find(p => p.id === s.dependeDe)));
+      if (prox) {
+        const hint = document.createElement('div'); hint.className = 'secao secao-lock';
+        hint.innerHTML = '<h2>' + prox.titulo + '</h2><div class="lock-msg">Complete o módulo anterior para liberar esta etapa.</div>';
+        form.appendChild(hint);
+      }
+      calcular();
+    }
+
+    function renderInput(q) {
+      const wrap = document.createElement('div'); wrap.className = 'opts' + ((q.tipo === 'enum' || q.tipo === 'multi') ? ' col' : '');
+      if (q.tipo === 'text') {
+        const i = document.createElement('input'); i.type = 'text'; i.value = estado[q.id] || '';
+        i.oninput = () => { estado[q.id] = i.value; }; wrap.appendChild(i); return wrap;
+      }
+      if (q.tipo === 'multi') {
+        q.opts.forEach(o => {
+          const l = document.createElement('label'); l.className = 'opt full';
+          const c = document.createElement('input'); c.type = 'checkbox'; c.value = o.v;
+          c.checked = (estado[q.id] || []).includes(o.v);
+          c.onchange = () => {
+            let arr = estado[q.id] || [];
+            if (o.v === 'NA') { arr = c.checked ? ['NA'] : []; }
+            else { arr = arr.filter(x => x !== 'NA'); c.checked ? arr.push(o.v) : arr = arr.filter(x => x !== o.v); }
+            estado[q.id] = arr; render();
+          };
+          l.appendChild(c); l.appendChild(document.createTextNode(' ' + o.r)); wrap.appendChild(l);
+        });
+        return wrap;
+      }
+      q.opts.forEach(o => {
+        const l = document.createElement('label'); l.className = 'opt' + (q.tipo === 'enum' ? ' full' : '');
+        const r = document.createElement('input'); r.type = 'radio'; r.name = q.id; r.value = o.v;
+        r.checked = estado[q.id] === o.v;
+        r.onchange = () => { estado[q.id] = o.v; render(); };
+        l.appendChild(r); l.appendChild(document.createTextNode(' ' + o.r)); wrap.appendChild(l);
+      });
+      return wrap;
+    }
+
+    function renderAtividades() {
+      const div = document.createElement('div'); div.className = 'q';
+      div.innerHTML = '<div class="texto"><b>1. Dados das atividades</b> — adicione as atividades; o porte e a classe são calculados.</div>';
+      const list = document.createElement('div'); list.style.marginTop = '8px';
+      atividades.forEach((a, idx) => {
+        const row = document.createElement('div'); row.className = 'ativ-row';
+        const cat = CATALOGO.find(c => c.cod === a.cod) || {};
+        const sel = document.createElement('select');
+        CATALOGO.forEach(c => { const op = document.createElement('option'); op.value = c.cod; op.textContent = c.cod + ' — ' + c.desc; if (a.cod === c.cod) op.selected = true; sel.appendChild(op); });
+        sel.onchange = () => { a.cod = sel.value; a.qtd = ''; a.potManual = 'M'; a.porteManual = 'P'; render(); };
+        row.appendChild(sel);
+        if (cat.manual) {
+          const sp = document.createElement('select');['P', 'M', 'G'].forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = 'Pot. ' + p; if (a.potManual === p) o.selected = true; sp.appendChild(o); }); sp.onchange = () => { a.potManual = sp.value; render(); }; row.appendChild(sp);
+          const spo = document.createElement('select');['P', 'M', 'G'].forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = 'Porte ' + p; if (a.porteManual === p) o.selected = true; spo.appendChild(o); }); spo.onchange = () => { a.porteManual = spo.value; render(); }; row.appendChild(spo);
+        } else {
+          const inp = document.createElement('input'); inp.type = 'number'; inp.placeholder = cat.un || 'qtde'; inp.value = (a.qtd !== undefined && a.qtd !== '' && !isNaN(a.qtd)) ? a.qtd : ''; inp.title = cat.un || ''; row.appendChild(inp);
+          const calc = document.createElement('div'); calc.className = 'calc'; const res = classeAtividade(a); calc.textContent = (cat.geral ? ('Pot ' + cat.geral + ' · Porte ' + (res.porte || '—')) : ''); row.appendChild(calc);
+          inp.oninput = () => { a.qtd = parseFloat(inp.value); const r = classeAtividade(a); calc.textContent = (cat.geral ? ('Pot ' + cat.geral + ' · Porte ' + (r.porte || '—')) : ''); cl.textContent = (r.classe || '—'); calcular(); };
+        }
+        const cl = document.createElement('div'); cl.className = 'classe'; cl.textContent = (classeAtividade(a).classe || '—'); row.appendChild(cl);
+        const rm = document.createElement('button'); rm.className = 'btn btn-rm'; rm.textContent = '×'; rm.title = 'remover'; rm.onclick = () => { atividades.splice(idx, 1); render(); };
+        row.appendChild(rm);
+        list.appendChild(row);
+      });
+      div.appendChild(list);
+      const add = document.createElement('button'); add.className = 'btn'; add.textContent = '+ adicionar atividade';
+      add.onclick = () => { atividades.push({ cod: 'A-02-09-7', qtd: '', potManual: 'M', porteManual: 'P' }); render(); };
+      div.appendChild(add);
+      return div;
+    }
+
+    /* ============ 4) MOTOR DE CÁLCULO ============ */
+    function classeAtividade(a) {
+      const cat = CATALOGO.find(c => c.cod === a.cod);
+      if (!cat) return {};
+      if (cat.manual) { return { potencial: a.potManual, porte: a.porteManual, classe: MATRIZ_CLASSE[a.porteManual][a.potManual] }; }
+      let porte = null;
+      const q = parseFloat(a.qtd);
+      if (!isNaN(q)) { porte = q <= cat.faixaP ? 'P' : (q <= cat.faixaM ? 'M' : 'G'); }
+      const classe = porte ? MATRIZ_CLASSE[porte][cat.geral] : null;
+      return { potencial: cat.geral, porte, classe };
+    }
+
+    function calcular() {
+      const res = document.getElementById('res');
+      const listada = estado.FRONT_LISTADA;
+      let competencia = '—', modalidade = null, status = 'wait', tela = null, eiarima = false;
+      const vedacoes = []; const locAtivos = [];
+
+      let fatorLoc = 0;
+      Object.keys(PESOS).forEach(id => { if (estado[id] === 'Sim') { const p = PESOS[id]; if (p > fatorLoc) fatorLoc = p; locAtivos.push({ id, p }); } });
+
+      SECOES.find(s => s.id === 'M2').perguntas.forEach(q => {
+        if (q.veda && estado[q.id] === 'Sim') vedacoes.push(q.veda);
+        if (q.tipo === 'multi') { (estado[q.id] || []).forEach(v => { const o = q.opts.find(x => x.v === v); if (o && o.veda) vedacoes.push(o.veda); }); }
+      });
+
+      let classeP = null;
+      atividades.forEach(a => { const c = classeAtividade(a).classe; if (c != null) { if (classeP == null || c > classeP) classeP = c; } });
+
+      if (estado.EXC_EIA === 'Sim') eiarima = true;
+
+      if (listada === 'Nao') { modalidade = 'DISPENSA'; status = 'disp'; tela = TELA_MODALIDADE['DISPENSA']; competencia = 'Não listada → Dispensa'; }
+      else if (estado.FRONT_TRANSPORTE === 'Sim') { modalidade = 'TRANSPORTE'; status = 'ok'; tela = TELA_MODALIDADE['TRANSPORTE']; competencia = 'Municipal'; }
+      else if (estado.FRONT_TIPO === 'RENOV') { modalidade = 'RENOVAÇÃO'; status = 'ok'; tela = TELA_MODALIDADE['RENOVAÇÃO']; competencia = 'Municipal'; }
+      else if (listada === 'Sim') {
+        competencia = 'Municipal (verificar SIMMA)';
+        if (vedacoes.length) status = 'bloq';
+        if (classeP != null) {
+          modalidade = MATRIZ_MODALIDADE[fatorLoc][classeP];
+          if (eiarima) modalidade = 'LAT';
+          tela = TELA_MODALIDADE[modalidade];
+          if (status !== 'bloq') status = 'ok';
+        }
+      }
+
+      let h = '';
+      h += kv('Competência', competencia);
+      h += kv('Solicitação', rotuloTipo(estado.FRONT_TIPO));
+      h += kv('Classe predominante', classeP != null ? ('Classe ' + classeP) : '— (informe atividades)');
+      h += kv('Fator locacional', fatorLoc + (locAtivos.length ? '' : ' (nenhum critério)'));
+      if (locAtivos.length) { h += '<div class="chips">' + locAtivos.map(x => '<span class="chip loc">' + x.id.replace(/^LOC_/, '') + ' ·' + x.p + '</span>').join('') + '</div>'; }
+      h += kv('EIA/RIMA (4.2)', eiarima ? 'Sim → força LAT' : 'Não');
+      h += kv('Vedações', vedacoes.length ? '' : 'nenhuma');
+      if (vedacoes.length) { h += '<div class="chips">' + vedacoes.map(v => '<span class="chip">' + v + '</span>').join('') + '</div>'; }
+
+      let cls = 'm-wait', txt = 'Aguardando preenchimento';
+      if (status === 'disp') { cls = 'm-disp'; txt = 'DISPENSA DE LICENCIAMENTO'; }
+      else if (status === 'bloq') { cls = 'm-bloq'; txt = 'VEDAÇÃO / BLOQUEIO' + (modalidade ? (' — modalidade calc.: ' + modalidade) : ''); }
+      else if (status === 'ok' && modalidade) { cls = 'm-ok'; txt = 'MODALIDADE: ' + modalidade; }
+      h += '<div class="modal-box ' + cls + '">' + txt + '</div>';
+      if (tela) h += '<div class="tela-tag">↳ Caracterização: ' + tela + '</div>';
+      if (status === 'bloq') h += '<p class="nota">Vedação ativa → no BPMN, candidato a <b>Indeferido</b> ou <b>Solicitar Adequação</b> antes de prosseguir.</p>';
+      res.innerHTML = h;
+    }
+    function kv(k, v) { return '<div class="kv"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>'; }
+    function rotuloTipo(t) { return ({ RENOV: 'Renovação (operação)', CORRETIVA: 'Corretiva', JA_DETENTOR: 'Já detentor (LP/LI)', AMPLIACAO: 'Ampliação', NOVA: 'Nova solicitação' })[t] || '—'; }
+
+    document.getElementById('btnReset').onclick = () => {
+      Object.keys(estado).forEach(k => delete estado[k]);
+      atividades.length = 0;
+      render();
+    };
+
+    render();
+  </script>
+</body>
+
+</html>

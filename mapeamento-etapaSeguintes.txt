@@ -1,0 +1,35 @@
+1 - MAPEAMENTO CRITÉRIOS LOCAIS:
+
+Na etapa de Critérios Locais, aparece o que foi declarado/selecionado na etapa de Atividades. 
+Preciso descobrir agora quais perguntas e por quê elas aparecem no critérios locais, 
+qual a regra usada para essa aparição. Porque varia a quantidade de perguntas e as perguntas selecionadas
+
+2 - MAPEAMENTO FATORES QUE ALTERAM A MODALIDADE:
+
+Adicionar a pergunta: 
+cód-11014 - O empreendimento irá realizar supressão de vegetação primária ou 
+secundária em estágio médio e avançado de regeneração, no Bioma Mata Atlântica? 
+
+SE SIM, aparece a mensagem:
+Conforme Parágrafo Único, Artigo 32, da Lei nº 11.428/06, a supressão de vegetação secundária 
+em estágio avançado e médio de regeneração para fins de atividades minerárias somente será admitida mediante:
+
+I - licenciamento ambiental, condicionado à apresentação de Estudo Prévio de Impacto Ambiental/Relatório de 
+Impacto Ambiental - EIA/RIMA, pelo empreendedor, e desde que demonstrada a inexistência de alternativa técnica e 
+locacional ao empreendimento proposto;
+
+II - adoção de medida compensatória que inclua a recuperação de área equivalente à área do empreendimento, 
+com as mesmas características ecológicas, na mesma bacia hidrográfica e sempre que possível na mesma microbacia hidrográfica, 
+independentemente do disposto no art. 36 da Lei no 9.985, de 18 de julho de 2000.
+
+Ademais, conforme art. 20 (e seu parágrafo único), da citada Lei nº11.428/06, o corte e a supressão da 
+vegetação primária do Bioma Mata Atlântica também suscitam a realização de Estudo Prévio de Impacto Ambiental/Relatório de Impacto Ambiental - EIA/RIMA. 
+
+
+3 - MAPEAMENTO DE FATORES QUE ALTERAM A MODALIDADE:
+Pergunta
+
+4 - MAPEAMENTO DE DADOS ADICIONAIS (V. 2)
+Pergunta
+
+
