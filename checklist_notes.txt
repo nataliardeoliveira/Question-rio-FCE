@@ -4,6 +4,24 @@ CORREÇÕES:
 ele decide responder novamente as perguntas após as mudanças, as respostas ficam salvas desde a vez anterior. Tem que haver a lógica para que 
 Ao mudar de fluxo, mudar a resposta de qualquer pergunta que leve a outra e coisas do tipo, essas respostas anteriores sejam apagadas.
 
+      /**
+       * Calcula vedações ativas (impedem licenciamento).
+       */
+      function calcularVedacoes() {
+        const vedacoes = [];
+        Object.entries(VEDACOES_MAP).forEach(([id, label]) => {
+          const radio = document.querySelector(`input[name="p${id}"][value="sim"]:checked`);
+          if (radio) vedacoes.push(label);
+        });
+        // checkboxes p117
+        document.querySelectorAll('input[name="p117"]:checked').forEach(cb => {
+          if (cb.value !== 'NA' && VEDACOES_117[cb.value]) {
+            vedacoes.push(VEDACOES_117[cb.value]);
+          }
+        });
+        return vedacoes;
+      }
+
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 RESOLVIDOS:

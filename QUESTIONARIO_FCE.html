@@ -3369,7 +3369,7 @@
         }
       }
 
-      
+      // Oculta todas as seções/etapas (fixas e dinâmicas) do formulário
       function ocultarTodasSecoes() {
         // Seções principais
         for (let i = 1; i <= 6; i++) {
@@ -3384,6 +3384,7 @@
         });
       }
 
+      // Exibe a seção correspondente à etapa informada e atualiza stepper/navegação/mapa
       function irParaEtapa(etapaAtual) {
         ocultarTodasSecoes();
 
@@ -3587,6 +3588,7 @@
         fluxoMapa = novoFluxoMapa;
       }
 
+      // Abre o popup de propriedades da atividade selecionada, em etapa2 ou etapa2-mapa
       function abrirPopup(container) {
         const select = container.querySelector('.itemAtividade');
         if (!select || !select.value || select.value === 'SELECIONE') return;
@@ -3595,6 +3597,7 @@
         overlay.style.display = 'flex';
       }
 
+      // Fecha o popup de propriedades da atividade, limpando eventual mensagem de erro
       function fecharPopup(container) {
         const isMapa = container.id === 'etapa2-mapa';
         const erroDiv = document.getElementById('erro-popup' + (isMapa ? '-mapa' : '-normal'));
@@ -4166,6 +4169,7 @@
         }
       ];
 
+      // Preenche unidade, parâmetro, código e descrição no popup, de acordo com a atividade selecionada
       function adicionarPropriedadesAtividadePopup(container) {
         const select = container.querySelector('.itemAtividade');
         const atividadeSelecionada = select.options[select.selectedIndex].value;
@@ -4187,6 +4191,7 @@
         }
       }
 
+      // Extrai o último número de um texto (normalizando vírgula decimal e ponto de milhar)
       function extrairUltimoNumero(texto) {
         const normalizado = texto
           .replace(/(\d),(\d)/g, '$1.$2')   // vírgula decimal: 3,0 → 3.0
@@ -4196,6 +4201,7 @@
         return parseFloat(numeros[numeros.length - 1]);
       }
 
+      // Determina o porte (p/m/g) comparando a quantidade informada aos limites de porte da atividade
       function determinarPorte(quantidade, atividade) {
         const qty = parseFloat(String(quantidade).replace(',', '.'));
         if (isNaN(qty) || !atividade) return '';
@@ -4357,6 +4363,7 @@
       const TAXA_DISPENSA_CERTIDAO = 69.48;
       const CATEGORIA_DISPENSA_CERTIDAO = '7.2.3 - Declarações e certidões relativas a processo de licenciamento e de regularização ambiental';
 
+      // Formata um valor numérico como moeda brasileira (R$)
       function formatarMoedaBRL(valor) {
         return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       }
@@ -4387,6 +4394,7 @@
         LAT: 'LP → LI → LO'
       };
 
+      // Retorna a descrição da fase/combinação de fases para exibição, dada a modalidade
       function determinarFaseLicenciamentoExibicao(modalidade) {
         return TABELA_MODALIDADE_FASE[modalidade] || '';
       }
@@ -4395,12 +4403,6 @@
       function montarCategoria(fase, classe) {
         const descricao = DESCRICAO_FASE_LICENCIAMENTO[fase] || fase;
         return `${descricao} (classe ${classe})`;
-      }
-
-      /** Número do DAE gerado localmente (13 dígitos, via timestamp). Em produção deve ser
-       *  substituído pelo número retornado pelo sistema emissor oficial (DAE Online / SISEMA). */
-      function gerarNumeroDae() {
-        return String(Date.now());
       }
 
       /** Vencimento = 31/12 do ano da solicitação (data de emissão). */
@@ -4417,6 +4419,7 @@
        * gerado aqui é apenas para visualização, não tem validade de pagamento real.
        */
 
+      // Abre/dispara a geração do PDF do DAE montado para a linha da grid de custos
       function emissaoDocumentoDae() {
         window.open(
           'https://feam.br/documents/d/feam/manual_emissao_pelo_cidadao_de_dae_avulso_site_sef_atualizado_2020_2-pdf',
@@ -4491,24 +4494,6 @@
       }
 
       /**
-       * Calcula vedações ativas (impedem licenciamento).
-       */
-      function calcularVedacoes() {
-        const vedacoes = [];
-        Object.entries(VEDACOES_MAP).forEach(([id, label]) => {
-          const radio = document.querySelector(`input[name="p${id}"][value="sim"]:checked`);
-          if (radio) vedacoes.push(label);
-        });
-        // checkboxes p117
-        document.querySelectorAll('input[name="p117"]:checked').forEach(cb => {
-          if (cb.value !== 'NA' && VEDACOES_117[cb.value]) {
-            vedacoes.push(VEDACOES_117[cb.value]);
-          }
-        });
-        return vedacoes;
-      }
-
-      /**
        * Calcula a Classe Predominante a partir do grid de atividades
        * já populado pelo formulário (itensAtividades + itensAtividadesMapa).
        */
@@ -4553,6 +4538,7 @@
         let _dispensa1NextId = 1;
         let jaInicializado = false;
 
+        // Inicializa o formulário: registra elementos/eventos, grids e módulos, com guarda contra reinicialização
         function init() {
           // Guarda contra reinicialização: se o ECM chamar init() de novo (ex.: ao
           // publicar/re-renderizar o documento), rodar tudo de novo recriaria os grids
@@ -4579,6 +4565,7 @@
           ctrlAnexos.init();
         }
 
+        // Registra referências jQuery aos elementos/campos e grids usados pelo formulário
         function registrarElementos() {
           $el.labelProtocolo = $('#numProtocolo');
           $el.campoProtocolo = $('#CAMPO_1');
@@ -4601,6 +4588,7 @@
           $el.telefoneContribuinte = $('#CAMPO_11');
         }
 
+        // Restaura o estado do formulário (respostas, grids e geometrias) a partir do JSON salvo
         function inicializarElementos() {
           montarMapaPais();
 
@@ -4726,6 +4714,7 @@
           }
         }
 
+        // Registra todos os listeners de eventos globais do formulário (change/input/click)
         function registrarEventos() {
           document.removeEventListener('change', onChangeCampo);
           document.addEventListener('change', onChangeCampo);
@@ -4903,6 +4892,7 @@
           });
         }
 
+        // Popula o select de atividades da etapa2 com todas as opções de LISTA_ATIVIDADES
         function opcoesSelectAtividades() {
           const select = document.querySelector('#etapa2 .itemAtividade');
           if (!select) return;
@@ -4967,6 +4957,7 @@
           abrirPopup(container);
         }
 
+        // Reseta os checkboxes e labels da área de ampliação (fluxo normal) ao estado inicial
         function resetarAreaAmpliacao() {
           const areaAmpliacao = document.getElementById('area-ampliacao');
           const chkAcrescimo = document.getElementById('chkAcrescimo');
@@ -5016,6 +5007,7 @@
           });
         }
 
+        // Configura a área de ampliação quando o usuário seleciona op4 no popup da etapa2-mapa
         function popUpAmpliacaoEmpMapa() {
           const op4_card3 = document.querySelector(`#card-3 input[value="op4"]`);
           if (!op4_card3 || !op4_card3.checked) return;
@@ -5023,6 +5015,7 @@
           configurarAreaAmpliacaoMapa();
         }
 
+        // Reseta os checkboxes e labels da área de ampliação (fluxo mapa) ao estado inicial
         function resetarAreaAmpliacaoMapa() {
           const areaAmpliacao = document.getElementById('area-ampliacao-mapa');
           const chkAcrescimo = document.getElementById('chkAcrescimo-mapa');
@@ -5075,6 +5068,7 @@
           ctrlMapa.sincronizarSelect();
         }
 
+        // Handler central de change/input: sincroniza respostas, visibilidade de filhos e validação
         function onChangeCampo(e) {
           if (!DocumentoVisualizacaoForm.estouEditando()) return;
           const el = e.target;
@@ -5165,6 +5159,7 @@
           }
         }
 
+        // Retorna a lista de cards obrigatórios não respondidos na etapa atual (com validações especiais)
         function validarEtapaAtual() {
           // Identificar a seção atual
           const rota = rotaAtiva();
@@ -5286,6 +5281,7 @@
           });
         }
 
+        // Remove o destaque visual e a mensagem de erro de validação de um card específico
         function limparErroCard(id) {
           const card = document.getElementById(id);
           if (!card) return;
@@ -5337,6 +5333,7 @@
           }
         }
 
+        // Inicializa o DevExtreme dxDataGrid de atividades da etapa2 (fluxo normal)
         function inicializarGridAtividades() {
           if (!$el.gridAtividades.length) return;
           $el.gridAtividades.dxDataGrid({
@@ -5357,6 +5354,7 @@
           gridAtividadesInstance = $el.gridAtividades.dxDataGrid('instance');
         }
 
+        // Inicializa o DevExtreme dxDataGrid de atividades da etapa2-mapa (fluxo mapa)
         function inicializarGridAtividadesMapa() {
           if (!$el.gridAtividadesMapa.length) return;
           $el.gridAtividadesMapa.dxDataGrid({
@@ -5377,6 +5375,7 @@
           gridAtividadesMapaInstance = $el.gridAtividadesMapa.dxDataGrid('instance');
         }
 
+        // Inicializa o DevExtreme dxDataGrid da lista de custos (DAEs)
         function inicializarGridCustos() {
           if (!$el.gridCustos.length) return;
           $el.gridCustos.dxDataGrid({
@@ -5415,6 +5414,7 @@
           gridCustosInstance = $el.gridCustos.dxDataGrid('instance');
         }
 
+        // Inicializa o DevExtreme dxDataGrid de enquadramento (fluxo normal)
         function inicializarGridEnquadramento() {
           if (!$el.gridEnquadramento.length) return;
           $el.gridEnquadramento.dxDataGrid({
@@ -5437,6 +5437,7 @@
           gridEnquadramentoInstance = $el.gridEnquadramento.dxDataGrid('instance');
         }
 
+        // Inicializa o DevExtreme dxDataGrid de enquadramento (fluxo mapa)
         function inicializarGridEnquadramentoMapa() {
           if (!$el.gridEnquadramentoMapa.length) return;
           $el.gridEnquadramentoMapa.dxDataGrid({
@@ -5460,6 +5461,7 @@
           gridEnquadramentoMapaInstance = $el.gridEnquadramentoMapa.dxDataGrid('instance');
         }
 
+        // Inicializa o DevExtreme dxDataGrid de atividades da dispensa de licenciamento (card-1)
         function inicializarGridAtividadesDispensa1() {
           if (!$el.gridAtividadesDispensa1.length) return;
           $el.gridAtividadesDispensa1.dxDataGrid({
@@ -5497,6 +5499,7 @@
           salvarRespostas();
         }
 
+        // Remove o município selecionado da tabela do popup "Listar Municípios"
         function removerMunicipioSelecionado(id) {
           id = String(id);
           const item = itensMunicipiosSelecionados.find(i => String(i.id) === id);
@@ -5513,6 +5516,7 @@
           salvarRespostas();
         }
 
+        // Marca o município informado como "maior abrangência" e recentraliza o mapa nele
         function marcarMunicipioMaiorAbrangencia(id) {
           id = String(id);
           itensMunicipiosSelecionados.forEach(item => { item.maiorAbrangencia = String(item.id) === id; });
@@ -5531,6 +5535,7 @@
           ctrlMapa.buscarEnderecoPublico();
         }
 
+        // Renderiza as linhas da tabela de municípios selecionados no popup "Listar Municípios"
         function renderTabelaMunicipios() {
           const corpo = document.getElementById('tabela-municipios-corpo');
           if (!corpo) return;
@@ -5676,6 +5681,7 @@
 
         const mapaPaisOr = {};
 
+        // Move o card 'OR' para logo depois do card-pai cuja condição está ativa
         function posicionarOr(idFilho, condicoes) {
           const ativa = condicoes.find(c => respostas[c.id] === c.val);
           if (!ativa) return;
@@ -5686,10 +5692,12 @@
           paiEl.insertAdjacentElement('afterend', filhoEl);
         }
 
+        // Retorna o elemento DOM do card correspondente ao id da pergunta
         function getCard(id) {
           return document.getElementById('card-' + id);
         }
 
+        // Exibe o card (define indentação/cor conforme o nível hierárquico) removendo a classe 'oculta'
         function mostrar(id) {
           const el = getCard(id);
           if (!el) return;
@@ -5706,11 +5714,13 @@
           el.classList.remove('oculta');
         }
 
+        // Oculta o card (adiciona a classe 'oculta')
         function ocultar(id) {
           const el = getCard(id);
           if (el) el.classList.add('oculta');
         }
 
+        // Marca visualmente (classe 'selecionada') o label correspondente ao valor escolhido na pergunta
         function marcarSelecionada(perguntaId, valor) {
           document.querySelectorAll(`[data-id="${perguntaId}"]`).forEach(label => {
             if (label.tagName === 'LABEL')
@@ -5718,6 +5728,7 @@
           });
         }
 
+        // Limpa recursivamente respostas/inputs/seleção visual de todos os filhos (e netos) de uma pergunta, e os oculta
         function limparFilhos(perguntaId) {
           (FILHOS[perguntaId] || []).forEach(filhoId => {
             // Limpa recursivamente os netos antes de ocultar o filho
@@ -5740,6 +5751,7 @@
 
         const mapaPais = {};
 
+        // Monta o mapa idFilho → idPai a partir de REGRAS_VISIBILIDADE, usado para calcular nível/indentação
         function montarMapaPais() {
           Object.entries(REGRAS_VISIBILIDADE).forEach(([chave, filhos]) => {
             const [idPai] = chave.split('|');
@@ -5749,6 +5761,7 @@
           });
         }
 
+        // Calcula a profundidade hierárquica de uma pergunta, subindo pela cadeia de pais (normais ou 'OR')
         function calcularNivelPergunta(idPergunta) {
           let nivel = 0, atual = idPergunta;
           while (mapaPais[atual] || mapaPaisOr[atual]) {
@@ -5758,6 +5771,7 @@
           return nivel;
         }
 
+        // Reordena no DOM os cards-filhos para ficarem logo após o card-pai, na ordem informada
         function ordenarFilhos(idPai, filhosIds) {
           const paiEl = getCard(idPai);
           if (!paiEl) return;
@@ -5768,11 +5782,13 @@
           });
         }
 
+        // Serializa o estado atual (gerarJSON) e persiste no campo oculto CAMPO_8
         function salvarRespostas() {
           const json = JSON.stringify(gerarJSON());
           sp_uteis.setValorCampoHTML($('#CAMPO_8'), json);
         }
 
+        // Monta o array completo (respostas + grids + geometrias) que é salvo em CAMPO_8
         function gerarJSON() {
           // dados do questionário
           const dadosFormulario = Object.entries(respostas).map(([id, valor]) => {
@@ -5823,6 +5839,7 @@
           ];
         }
 
+        // Calcula a modalidade de licenciamento a partir da classe máxima das atividades e do fator locacional
         function calcularModalidade() {
           const todasAtividades = [...itensAtividades, ...itensAtividadesMapa];
           if (todasAtividades.length === 0) return null;
@@ -5892,6 +5909,7 @@
             .trim();
         }
 
+        // Recalcula e atualiza os grids de enquadramento (normal e mapa) com a modalidade/classe/fator atuais
         function recalcularEnquadramento() {
           const resultado = calcularModalidade();
           const tipoSolicitacaoValor = obterTipoSolicitacaoValor();
@@ -5963,11 +5981,9 @@
               categoria: CATEGORIA_DISPENSA_CERTIDAO,
               valorDae: formatarMoedaBRL(TAXA_DISPENSA_CERTIDAO),
               vencimento: calcularVencimentoDae(),
-              nDae: gerarNumeroDae(),
               situacaoPagamento: 'A pagar',
             }];
 
-            atualizarAvisoAguardandoPagamento();
             if (gridCustosInstance) {
               gridCustosInstance.option('dataSource', itensCustos);
             }
@@ -6001,23 +6017,12 @@
             categoria: modalidade ? montarCategoria(fase, resultadoModalidade.classeMax) : '',
             valorDae: valorDae != null ? formatarMoedaBRL(valorDae) : '',
             vencimento: valorDae != null ? calcularVencimentoDae() : '',
-            nDae: valorDae != null ? gerarNumeroDae() : '',
             situacaoPagamento,
           }];
 
-          atualizarAvisoAguardandoPagamento();
           if (gridCustosInstance) {
             gridCustosInstance.option('dataSource', itensCustos);
           }
-        }
-
-        // Mostra/esconde o aviso laranja da etapa final conforme a situação de
-        // pagamento do item atual da grid de custos.
-        function atualizarAvisoAguardandoPagamento() {
-          const aviso = document.getElementById('aviso-aguardando-pagamento');
-          if (!aviso) return;
-          const situacao = (itensCustos[0]?.situacaoPagamento || '').toLowerCase();
-          aviso.style.display = situacao === 'aguardando pagamento' ? '' : 'none';
         }
 
         // Limpeza de grids do fluxo NORMAL (etapa2 / etapa4)
@@ -6111,10 +6116,12 @@
         const geometrias = [];
         let geometriasPendentes = [];
 
+        // Armazena geometrias salvas para restaurar quando o mapa terminar de inicializar
         function setPendentes(geoms) {
           geometriasPendentes = geoms || [];
         }
 
+        // Inicializa o mapa (carregando leaflet-draw se necessário) e restaura geometrias pendentes
         function init() {
           if (inicializado) return;
 
@@ -6146,6 +6153,7 @@
           return document.getElementById('etapa2-mapa');
         }
 
+        // Busca um elemento dentro da seção etapa2-mapa pelo seletor informado
         function getEl(selector) {
           return getEtapa()?.querySelector(selector);
         }
@@ -6169,6 +6177,7 @@
           sincronizarSelect();
         }
 
+        // Remove do select de denominação as opções cujo tipo já foi usado por uma geometria desenhada
         function sincronizarSelect() {
           const select = getEl('#selectGeometria');
           if (!select) return;
@@ -6179,6 +6188,7 @@
           });
         }
 
+        // Carrega dinamicamente o script leaflet-draw (se ainda não estiver carregado) e chama o callback
         function carregarLeafletDraw(callback) {
           if (window.L && window.L.Control && window.L.Control.Draw) { callback(); return; }
           const script = document.createElement('script');
@@ -6188,6 +6198,7 @@
           document.head.appendChild(script);
         }
 
+        // Popula o select de atividades da etapa2-mapa com todas as opções de LISTA_ATIVIDADES
         function listaAtividadesEtapa2() {
           const select = document.getElementById('itemAtividadeMapa');
 
@@ -6199,6 +6210,7 @@
           });
         }
 
+        // Cria o mapa Leaflet, camadas de desenho e centraliza em Minas Gerais
         function inicializarMapa() {
           const mapContainer = getEl('#map');
           const select = document.getElementById("selectGeometria")
@@ -6228,6 +6240,7 @@
           buscarEnderecoInicial();
         }
 
+        // Registra os eventos do mapa: desenho de geometrias, seleção de denominação e importação de shapefile
         function registrarEventosMapa() {
           map.on(L.Draw.Event.CREATED, function (e) {
             const layer = e.layer;
@@ -6330,16 +6343,19 @@
           }
         }
 
+        // Força o Leaflet a recalcular o tamanho do mapa (necessário após exibir um container antes oculto)
         function ajustarMapa() {
           setTimeout(() => { if (map) map.invalidateSize(); }, 500);
         }
 
+        // Dispara a busca de endereço automaticamente se o campo de busca já tiver valor
         function buscarEnderecoInicial() {
           const input = getEl('#searchInput');
           if (!input || !input.value) return;
           buscarEndereco();
         }
 
+        // Geocodifica o endereço digitado (via Nominatim/OpenStreetMap) e recentraliza o mapa
         function buscarEndereco() {
           const input = getEl('#searchInput');
           if (!input) return;
@@ -6357,6 +6373,7 @@
             .catch(() => console.error('Erro ao buscar endereço'));
         }
 
+        // Associa a geometria desenhada ao tipo selecionado, adiciona à lista e persiste
         function salvarGeometria(geojson) {
           const select = getEl('#selectGeometria');
 
@@ -6377,6 +6394,7 @@
           formularioCustumizado.salvarRespostas?.();
         }
 
+        // Reconstrói a lista visual de geometrias delimitadas e reata os eventos de remoção
         function atualizarLista() {
           const container = getEl('#listaGeometrias');
 
@@ -6393,6 +6411,7 @@
           registrarEventosRemocao();
         }
 
+        // Remove a geometria informada do mapa e do select, devolvendo a opção de denominação
         function removerGeometria(index) {
           const item = geometrias[index];
           if (!item) return;
@@ -6420,6 +6439,7 @@
           formularioCustumizado.salvarRespostas?.();
         }
 
+        // Liga o evento de clique nos botões de remover geometria da lista visual
         function registrarEventosRemocao() {
           getEtapa()?.querySelectorAll('.btn-remover').forEach(btn => {
             btn.addEventListener('click', () => removerGeometria(btn.dataset.index));
@@ -6467,6 +6487,7 @@
           }
         }
 
+        // Indica se o mapa já foi inicializado
         function estaInicializado() { return inicializado; }
         return { init, getMapa, buscarEnderecoPublico: buscarEndereco, getGeometrias, estaInicializado, setPendentes, sincronizarSelect, limpar };
       })();
@@ -6475,11 +6496,13 @@
 
       // Controle dos Anexos
       const ctrlAnexos = (function () {
+        // Inicializa o controle de anexos: registra eventos e preenche nomes de arquivos já anexados
         function init() {
           registrarEventos();
           preencherNomesArquivosExistentes();
         }
 
+        // Registra o evento de change dos inputs de arquivo para inserir/atualizar os anexos
         function registrarEventos() {
           $("input[type=file]").off("change.anexos");
           $("input[type=file]").on("change.anexos", async function (e) {
@@ -6515,6 +6538,7 @@
           });
         }
 
+        // Exibe (ou limpa) o nome do arquivo anexado ao lado do input de arquivo correspondente
         function exibirNomeArquivo(input, nome) {
           const $grupo = $(input).closest(".grupo-arquivo");
           let $span = $grupo.find(".campo-arquivo-nome");
@@ -6532,6 +6556,7 @@
           }
         }
 
+        // Exibe o nome de cada anexo já salvo no documento, ao carregar/restaurar o formulário
         function preencherNomesArquivosExistentes() {
           const documentosAnexados = DocumentoVisualizacaoForm.retornaListaAnexosDocumento();
           $("input[type=file]").each(function () {
@@ -6544,6 +6569,7 @@
           });
         }
 
+        // Busca o nomeId do anexo já salvo para o tipo de anexo informado
         function resgatarNomeId(tipoAnexoId) {
           let nomeId = "";
           DocumentoVisualizacaoForm.retornaListaAnexosDocumento().forEach(anexos => {
@@ -6552,6 +6578,7 @@
           return nomeId;
         }
 
+        // Lê o arquivo selecionado, remove o anexo anterior (se houver) e insere o novo anexo via API
         async function adicionarDocumento(arquivoUpload, tipoAnexoId, nomeId) {
           try {
             let parametrosAnexar = await obterDocumento(arquivoUpload);
@@ -6564,6 +6591,7 @@
           }
         }
 
+        // Lê o arquivo selecionado como base64 e monta os parâmetros para anexar via API
         function obterDocumento(arquivoUpload) {
           return new Promise((resolve, reject) => {
             const arquivoSelecionado = arquivoUpload.files[0];
@@ -6581,10 +6609,12 @@
           });
         }
 
+        // Wrappers finos sobre a API do ECM para inserir, excluir e obter a URL de um anexo
         async function inserirAnexo(p) { return await Ecm.Api2.Post("documentos/inserir/anexo", p); }
         async function deletarDocumento(nomeId) { return await Ecm.Api2.Delete(`anexos/${nomeId}`); }
         async function obterUrlArquivo(nomeId) { return await Ecm.Api2.Get(`anexos/${nomeId}/url`); }
 
+        // Remove/normaliza caracteres inválidos do nome do arquivo antes de enviar ao ECM
         function converterNomeArquivoValido(nomeArquivo) {
           let partes = nomeArquivo.split(".");
           let extensao = partes.pop();
