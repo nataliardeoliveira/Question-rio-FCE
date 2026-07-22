@@ -4412,21 +4412,6 @@
         return dataVencimento.toLocaleDateString('pt-BR');
       }
 
-      /**
-       * Monta o HTML do DAE (leiaute SEF/MG, MOD. 06.01.11) para a linha da grid
-       * de custos e gera um arquivo PDF de fato (via html2pdf.js), disparando o
-       * download. Não inclui código de barras/linha digitável — o documento
-       * gerado aqui é apenas para visualização, não tem validade de pagamento real.
-       */
-
-      // Abre/dispara a geração do PDF do DAE montado para a linha da grid de custos
-      function emissaoDocumentoDae() {
-        window.open(
-          'https://feam.br/documents/d/feam/manual_emissao_pelo_cidadao_de_dae_avulso_site_sef_atualizado_2020_2-pdf',
-          '_blank'
-        );
-      }
-
       /* ============================================================
          MOTOR FCE — Fator Locacional e Classe Predominante
          Derivado da DN COPAM 217/2017 + 05-poc-fce.html
@@ -5403,7 +5388,7 @@
                 buttons: [{
                   hint: 'Emitir DAE',
                   icon: 'doc',
-                  visible: e => !!e.row.data.nDae,
+                  visible: e => !!e.row.data.valorDae,
                   onClick: e => emissaoDocumentoDae()
                 }]
               },
@@ -5413,6 +5398,21 @@
           });
           gridCustosInstance = $el.gridCustos.dxDataGrid('instance');
         }
+
+      /**
+       * Monta o HTML do DAE (leiaute SEF/MG, MOD. 06.01.11) para a linha da grid
+       * de custos e gera um arquivo PDF de fato (via html2pdf.js), disparando o
+       * download. Não inclui código de barras/linha digitável — o documento
+       * gerado aqui é apenas para visualização, não tem validade de pagamento real.
+       */
+
+      // Abre/dispara a geração do PDF do DAE montado para a linha da grid de custos
+      function emissaoDocumentoDae() {
+        window.open(
+          'https://feam.br/documents/d/feam/manual_emissao_pelo_cidadao_de_dae_avulso_site_sef_atualizado_2020_2-pdf',
+          '_blank'
+        );
+      }
 
         // Inicializa o DevExtreme dxDataGrid de enquadramento (fluxo normal)
         function inicializarGridEnquadramento() {
